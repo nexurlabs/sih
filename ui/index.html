@@ -163,30 +163,30 @@
     }
     function drawNet(g, current) {
       const el = $("net");
-      if (!el || !window.vis) return;
-      const nodes = new vis.DataSet((g.nodes || []).map((n) => ({
-        id: n.id,
-        label: n.label || n.id,
-        color: n.id === current ? { background: "#b33a2a", border: "#b33a2a", highlight: { background: "#b33a2a" } } : { background: "#f3eee4", border: "#1c1814" },
-        font: { face: "IBM Plex Sans", size: 16, color: n.id === current ? "#f3eee4" : "#1c1814", bold: true },
-        shape: "box",
-        margin: 14,
-        widthConstraint: { minimum: 140, maximum: 220 },
-      })));
-      const edges = new vis.DataSet((g.edges || []).map((e) => ({
-        from: e.from,
-        to: e.to,
-        label: e.caption || "linked",
-        font: { face: "IBM Plex Sans", size: 14, color: "#1c1814", strokeWidth: 4, strokeColor: "#f3eee4" },
-        color: { color: "#6b6358" },
-        width: 2,
-        arrows: "",
-      })));
-      net = new vis.Network(el, { nodes, edges }, {
-        physics: false,
-        layout: { hierarchical: { enabled: true, direction: "LR", levelSeparation: 220, nodeSpacing: 120 } },
-        interaction: { zoomView: false, dragView: false },
-      });
+      if (!el) return;
+      if (net) { net.destroy?.(); net = null; }
+      const allNodes = g.nodes || [], allEdges = g.edges || [];
+      const connected = new Set([current]);
+      allEdges.forEach((e) => { if (e.from === current || e.to === current) { connected.add(e.from); connected.add(e.to); } });
+      const nodes = allNodes.filter((n) => connected.has(n.id));
+      const edges = allEdges.filter((e) => connected.has(e.from) && connected.has(e.to));
+      if (!nodes.length) { el.innerHTML = '<div class="graph-empty">Analyse another .eml to reveal shared indicators.</div>'; return; }
+      const w = 900, h = 360, boxW = Math.min(270, Math.max(210, 720 / Math.max(nodes.length, 2))), boxH = 112;
+      const gap = nodes.length > 1 ? (w - 2 * 80 - nodes.length * boxW) / (nodes.length - 1) : 0;
+      const y = 120;
+      const pos = new Map(nodes.map((n, i) => [n.id, { x: 80 + i * (boxW + gap), y }]));
+      const escSvg = (s) => esc(s).replace(/'/g, "&#39;");
+      const lineEls = edges.map((e, i) => {
+        const a = pos.get(e.from), b = pos.get(e.to); if (!a || !b) return '';
+        const x1=a.x+boxW, x2=b.x, cy=y+boxH/2;
+        const label=escSvg(e.caption || 'shared indicators');
+        return `<line x1="${x1}" y1="${cy}" x2="${x2}" y2="${cy}" stroke="#b33a2a" stroke-width="4"/><rect x="${(x1+x2)/2-92}" y="${cy-34}" width="184" height="62" fill="#f7f1e6" stroke="#c9bfb0"/><text x="${(x1+x2)/2}" y="${cy-7}" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" font-weight="500" fill="#1c1814">Reply-To + same hop</text><text x="${(x1+x2)/2}" y="${cy+13}" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" font-weight="500" fill="#1c1814">+ domain</text>`;
+      }).join('');
+      const nodeEls = nodes.map((n) => {
+        const p=pos.get(n.id), active=n.id===current, parts=(n.label || n.id).split(' '), code=parts.shift() || '', name=parts.join(' ');
+        return `<g><rect x="${p.x}" y="${p.y}" width="${boxW}" height="${boxH}" fill="${active ? '#b33a2a' : '#f3eee4'}" stroke="${active ? '#b33a2a' : '#1c1814'}" stroke-width="2"/><text x="${p.x+18}" y="${p.y+30}" font-family="IBM Plex Mono" font-size="16" font-weight="500" fill="${active ? '#f7f1e6' : '#6b6358'}">${escSvg(code)}</text><text x="${p.x+18}" y="${p.y+60}" font-family="IBM Plex Sans" font-size="19" font-weight="500" fill="${active ? '#fffaf1' : '#1c1814'}">${escSvg(name)}</text><text x="${p.x+18}" y="${p.y+88}" font-family="IBM Plex Sans" font-size="14" fill="${active ? '#f7d8cf' : '#6b6358'}">analysed email</text></g>`;
+      }).join('');
+      el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Campaign relationships graph">${lineEls}${nodeEls}<text x="${w/2}" y="42" text-anchor="middle" font-family="IBM Plex Mono" font-size="13" letter-spacing="2" fill="#6b6358">SHARED INDICATORS, NOT IDENTITY PROOF</text></svg>`;
     }
     loadSamples();
   </script>

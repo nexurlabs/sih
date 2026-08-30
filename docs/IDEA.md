@@ -1,17 +1,13 @@
 # Idea text — paste into PEC form / sih.gov.in
 
 **Problem statement:** SIH26106  
-**Title (suggested,  under ~100 chars):**  
-MailTrace: email threat lab with origin hops, not a spam filter
+**Title (suggested, under ~100 chars):**  
+MailTrace: Explainable email threat detection with origin and campaign forensics
 
 **Description (paste):**
 
-MailTrace is an analyst lab for SIH26106. An investigator uploads a saved .eml file. The system returns a risk score with human reasons, a map of the earliest reliable sending hop (city and ISP, not a person's GPS), SPF/DKIM/DMARC stamp results, a campaign graph linking related mails, and a PDF whose SHA-256 matches that exact file.
+MailTrace is a local-first analyst platform for SIH26106. An investigator uploads a saved `.eml` file. The system preserves and hashes the exact bytes, extracts message headers and MIME content, surfaces SPF/DKIM/DMARC and sender-alignment evidence, reconstructs the Received chain, and reports the earliest reliable hop as hosting city/ISP with confidence. It then gives an explainable risk score for spoofing, phishing and BEC, links related emails through shared infrastructure, and exports a forensic case PDF.
 
-This is not Gmail login and not a 2003 spam-word classifier. Detection without origin fails the problem. Origin without reasons is theatre. MailTrace fuses both on a laptop (localhost). Demo corpus: eight crafted mails (clean, display-name spoof, lookalike domain, SPF fail, BEC invoice, credential phish, two-mail campaign).
+The key difference from a spam/ham filter is the evidence trail: the analyst can see why a message is suspicious, where it likely travelled through, and whether another message shares the same Reply-To, domain or origin hop. The prototype runs on a laptop with local crafted `.eml` cases; it does not require Gmail access, send phishing, or claim the exact location of a human. Live DNS verification, larger GeoIP/ASN data, privacy controls and model calibration are the production hardening path.
 
-No live mailbox ingest. No sending phishing. No claim that we located a human. Geo is hosting intelligence with confidence. Evidence is a local hash chain, not a public blockchain.
-
-**Tech (one line):** FastAPI + MIME parser + SQLite + NetworkX + Leaflet + vis-network + reportlab PDF.
-
-**Do not put in the form:** public URL, Gmail OAuth, teammate sklearn pickle as the product.
+**Tech (one line):** FastAPI + Python MIME parser + SQLite + NetworkX + Leaflet + ReportLab PDF; optional TF-IDF language signal.
