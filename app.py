@@ -12,7 +12,7 @@ from mailtrace.intel import lookup_domains
 from mailtrace.parse import parse_eml
 from mailtrace.pdf_report import write_pdf
 from mailtrace.score import fuse
-from mailtrace.store import all_cases, load_case, save_case
+from mailtrace.store import all_cases, clear_cases, load_case, save_case
 
 ROOT = Path(__file__).resolve().parent
 SAMPLES = ROOT / "samples"
@@ -50,6 +50,12 @@ def health():
 def list_samples():
     files = sorted(SAMPLES.glob("*.eml"))
     return [{"name": f.name, "bytes": f.stat().st_size} for f in files]
+
+
+@app.post("/api/reset")
+def reset():
+    clear_cases()
+    return {"ok": True, "cleared": True}
 
 
 @app.get("/api/cases")

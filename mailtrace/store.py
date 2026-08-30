@@ -53,3 +53,10 @@ def all_cases() -> list[dict[str, Any]]:
     rows = con.execute("SELECT payload FROM cases ORDER BY created_at").fetchall()
     con.close()
     return [json.loads(r["payload"]) for r in rows]
+
+
+def clear_cases() -> None:
+    con = connect()
+    con.execute("DELETE FROM cases")
+    con.commit()
+    con.close()

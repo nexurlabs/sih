@@ -63,7 +63,7 @@ def write_pdf(case: dict[str, Any]) -> Path:
         c.drawString(18 * mm, y, "None yet. Analyse a second related .eml.")
         y -= 4 * mm
     for e in edges[:8]:
-        c.drawString(18 * mm, y, f"{e.get('from')} -- {e.get('to')}  {', '.join(e.get('shared') or [])}"[:100])
+        c.drawString(18 * mm, y, f"{e.get('from')} -- {e.get('to')}  {e.get('caption') or ', '.join(e.get('shared') or [])}"[:100])
         y -= 4 * mm
     y -= 6 * mm
     c.setFont("Times-Bold", 11)

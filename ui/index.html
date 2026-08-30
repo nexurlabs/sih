@@ -39,7 +39,7 @@
     .who { font-family: "IBM Plex Mono", monospace; font-size: 11px; }
     .ip { color: var(--muted); font-size: 12px; }
     #map { height: 200px; border: 1px solid var(--rule); background: #efe6d6; }
-    #net { height: 200px; border: 1px solid var(--rule); background: #f7f1e6; }
+    #net { height: 280px; border: 1px solid var(--rule); background: #f7f1e6; }
     .foot { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--ink); padding-top: 10px; margin-top: 18px; font-family: "IBM Plex Mono", monospace; font-size: 10px; color: var(--muted); word-break: break-all; }
     .hidden { display: none; }
     .sub { margin-top: 8px; font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); }
@@ -167,17 +167,25 @@
       const nodes = new vis.DataSet((g.nodes || []).map((n) => ({
         id: n.id,
         label: n.label || n.id,
-        color: n.id === current ? "#b33a2a" : "#e8e0d2",
-        font: { face: "IBM Plex Mono", size: 11 },
+        color: n.id === current ? { background: "#b33a2a", border: "#b33a2a", highlight: { background: "#b33a2a" } } : { background: "#f3eee4", border: "#1c1814" },
+        font: { face: "IBM Plex Sans", size: 16, color: n.id === current ? "#f3eee4" : "#1c1814", bold: true },
+        shape: "box",
+        margin: 14,
+        widthConstraint: { minimum: 140, maximum: 220 },
       })));
       const edges = new vis.DataSet((g.edges || []).map((e) => ({
-        from: e.from, to: e.to, label: (e.shared || [])[0] || "",
-        font: { size: 9 },
+        from: e.from,
+        to: e.to,
+        label: e.caption || "linked",
+        font: { face: "IBM Plex Sans", size: 14, color: "#1c1814", strokeWidth: 4, strokeColor: "#f3eee4" },
+        color: { color: "#6b6358" },
+        width: 2,
+        arrows: "",
       })));
       net = new vis.Network(el, { nodes, edges }, {
         physics: false,
-        edges: { color: "#6b6358", arrows: "to" },
-        layout: { randomSeed: 2 },
+        layout: { hierarchical: { enabled: true, direction: "LR", levelSeparation: 220, nodeSpacing: 120 } },
+        interaction: { zoomView: false, dragView: false },
       });
     }
     loadSamples();
