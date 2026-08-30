@@ -95,9 +95,25 @@ def parse_eml(data: bytes, filename: str = "upload.eml") -> dict[str, Any]:
     return_raw = msg.get("Return-Path", "") or ""
     display, from_addr = parseaddr(from_raw)
     body = ""
+    attachments: list[dict[str, Any]] = []
     if msg.is_multipart():
         for part in msg.walk():
-            if part.get_content_type() == "text/plain":
+            disposition = part.get_content_disposition()
+            filename_part = part.get_filename()
+            if disposition == "attachment" or filename_part:
+                payload = part.get_payload(decode=True)
+                if payload is None:
+                    raw_payload = part.get_payload()
+                    payload = raw_payload.encode("utf-8", errors="replace") if isinstance(raw_payload, str) else bytes(raw_payload or b"")
+                attachments.append(
+                    {
+                        "filename": filename_part or "unnamed-attachment",
+                        "content_type": part.get_content_type(),
+                        "size": len(payload),
+                        "sha256": hashlib.sha256(payload).hexdigest(),
+                    }
+                )
+            elif part.get_content_type() == "text/plain":
                 try:
                     body += str(part.get_content())
                 except Exception:
@@ -131,6 +147,7 @@ def parse_eml(data: bytes, filename: str = "upload.eml") -> dict[str, Any]:
         "message_id": msg.get("Message-ID", "") or "",
         "body": body[:4000],
         "urls": list(dict.fromkeys(urls))[:20],
+        "attachments": attachments[:20],
         "hops": hops,
         "origin": origin,
         "auth": _auth_flags(msg),

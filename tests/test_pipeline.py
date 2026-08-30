@@ -64,3 +64,24 @@ def test_demo_corpus_labels():
         out = fuse(p)
         assert out["label"] == label
         assert len(p["sha256"]) == 64
+
+
+def test_attachment_metadata_is_hashed_without_execution():
+    from email.message import EmailMessage
+    import hashlib
+
+    msg = EmailMessage()
+    msg["From"] = "sender@example.org"
+    msg["To"] = "analyst@example.org"
+    msg["Subject"] = "Attachment test"
+    msg.set_content("A harmless test message.")
+    payload = b"benign attachment bytes"
+    msg.add_attachment(payload, maintype="application", subtype="pdf", filename="invoice.pdf")
+
+    parsed = parse_eml(msg.as_bytes(), "attachment-test.eml")
+    assert parsed["attachments"] == [{
+        "filename": "invoice.pdf",
+        "content_type": "application/pdf",
+        "size": len(payload),
+        "sha256": hashlib.sha256(payload).hexdigest(),
+    }]
