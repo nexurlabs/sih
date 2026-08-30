@@ -1,0 +1,12 @@
+Return-Path: <bot@mail-secure.net>
+Received: from ec2-18-184.eu-central-1.compute.amazonaws.com ([18.184.10.20])
+	by mx.example.net with ESMTP id f6
+Authentication-Results: mx.example.net; spf=fail; dkim=fail; dmarc=fail
+From: "IT Helpdesk" <it@pec-edu.in>
+To: student@pec.edu.in
+Subject: Mailbox will be suspended
+Message-ID: <phish-006@pec-edu.in>
+Content-Type: text/plain; charset=utf-8
+
+Your mailbox is suspended. Verify your password immediately:
+http://192.168.1.100/login

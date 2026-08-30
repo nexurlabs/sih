@@ -1,0 +1,14 @@
+Return-Path: <bounce@mail-secure.net>
+Received: from ec2-18-184.eu-central-1.compute.amazonaws.com (ec2-18-184.eu-central-1.compute.amazonaws.com [18.184.10.20])
+	by mx.google.com with ESMTPS id b2; Sun, 30 Aug 2026 12:10:00 +0530
+Authentication-Results: mx.google.com; spf=fail smtp.mailfrom=mail-secure.net; dkim=none; dmarc=fail header.from=gmail.com
+Received-SPF: fail (gmail.com: 18.184.10.20 not designated)
+From: "PEC Principal" <random.account@gmail.com>
+Reply-To: verify-now@mail-secure.net
+To: student@pec.edu.in
+Subject: Urgent circular — fee waiver
+Message-ID: <spoof-002@mail-secure.net>
+Date: Sun, 30 Aug 2026 12:09:00 +0530
+Content-Type: text/plain; charset=utf-8
+
+Office of the Principal. Submit documents immediately.

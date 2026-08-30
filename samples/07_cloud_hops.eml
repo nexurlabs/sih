@@ -1,0 +1,16 @@
+Return-Path: <camp@mail-secure.net>
+Received: from mx.google.com (mx.google.com [8.8.8.8])
+	by mailbox.pec.edu.in with ESMTPS id g7a
+Received: from mail-relay.example.net (mail-relay.example.net [185.199.108.153])
+	by mx.google.com with ESMTPS id g7b
+Received: from ec2-18-184.eu-central-1.compute.amazonaws.com (ec2-18-184.eu-central-1.compute.amazonaws.com [18.184.10.20])
+	by mail-relay.example.net with ESMTP id g7c
+Authentication-Results: mx.google.com; spf=fail smtp.mailfrom=mail-secure.net; dkim=none; dmarc=fail
+From: "Campaign Desk" <desk@mail-secure.net>
+Reply-To: camp@mail-secure.net
+To: student@pec.edu.in
+Subject: Shared campaign A
+Message-ID: <cloud-007@mail-secure.net>
+Content-Type: text/plain; charset=utf-8
+
+First notice. Ignore if this is a drill sample.

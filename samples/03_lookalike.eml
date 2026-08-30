@@ -1,0 +1,11 @@
+Return-Path: <pay@paypa1.com>
+Received: from unknown (unknown [52.94.76.10])
+	by mx.example.net with ESMTP id c3; Sun, 30 Aug 2026 13:00:00 +0000
+Authentication-Results: mx.example.net; spf=fail smtp.mailfrom=paypa1.com; dkim=fail; dmarc=fail
+From: "Accounts" <service@paypa1.com>
+To: student@pec.edu.in
+Subject: Invoice unpaid
+Message-ID: <look-003@paypa1.com>
+Content-Type: text/plain; charset=utf-8
+
+Pay at https://paypa1.com/invoice/77 to avoid suspension.

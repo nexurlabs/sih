@@ -1,0 +1,12 @@
+Return-Path: <notice@pec.edu.in>
+Received: from rogue.example (rogue.example [18.184.10.20])
+	by mx.example.net with ESMTP id d4; Sun, 30 Aug 2026 14:00:00 +0000
+Authentication-Results: mx.example.net; spf=fail smtp.mailfrom=pec.edu.in; dkim=fail header.d=pec.edu.in; dmarc=fail
+Received-SPF: fail (pec.edu.in: 18.184.10.20 not designated)
+From: "Exam Cell" <notice@pec.edu.in>
+To: student@pec.edu.in
+Subject: Seating plan
+Message-ID: <spf-004@rogue.example>
+Content-Type: text/plain; charset=utf-8
+
+Seating plan attached as a link. Ignore if already received.

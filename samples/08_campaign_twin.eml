@@ -1,0 +1,14 @@
+Return-Path: <camp@mail-secure.net>
+Received: from mx.google.com (mx.google.com [8.8.8.8])
+	by mailbox.pec.edu.in with ESMTPS id h8a
+Received: from ec2-18-184.eu-central-1.compute.amazonaws.com (ec2-18-184.eu-central-1.compute.amazonaws.com [18.184.10.20])
+	by mx.google.com with ESMTPS id h8b
+Authentication-Results: mx.google.com; spf=fail smtp.mailfrom=mail-secure.net; dkim=none; dmarc=fail
+From: "Campaign Desk" <followup@mail-secure.net>
+Reply-To: camp@mail-secure.net
+To: student@pec.edu.in
+Subject: Shared campaign B
+Message-ID: <cloud-008@mail-secure.net>
+Content-Type: text/plain; charset=utf-8
+
+Second notice from the same reply-to and hop. This is the graph twin.

@@ -1,0 +1,13 @@
+Return-Path: <finance@mail-secure.net>
+Received: from ec2-18-184.eu-central-1.compute.amazonaws.com ([18.184.10.20])
+	by mx.example.net with ESMTP id e5
+Authentication-Results: mx.example.net; spf=fail; dkim=none; dmarc=fail
+From: "Director (Admin)" <director@pec.edu.in>
+Reply-To: payments@mail-secure.net
+To: accounts@pec.edu.in
+Subject: Change of account — pay vendor today
+Message-ID: <bec-005@mail-secure.net>
+Content-Type: text/plain; charset=utf-8
+
+I am in a meeting. Wire the amount to the new bank account in the note.
+Urgent payment. Do not call.

@@ -1,0 +1,13 @@
+Return-Path: <tutor@pec.edu.in>
+Received: from mail.pec.edu.in (mail.pec.edu.in [103.25.60.12])
+	by mx.example.net with ESMTPS id a1; Sun, 30 Aug 2026 10:01:00 +0530
+Authentication-Results: mx.example.net; spf=pass smtp.mailfrom=pec.edu.in; dkim=pass header.d=pec.edu.in; dmarc=pass header.from=pec.edu.in
+Received-SPF: pass (pec.edu.in: 103.25.60.12 designated)
+From: "KOM Tutor" <tutor@pec.edu.in>
+To: student@pec.edu.in
+Subject: Tutorial 11 — instantaneous centres
+Message-ID: <clean-001@pec.edu.in>
+Date: Sun, 30 Aug 2026 10:00:00 +0530
+Content-Type: text/plain; charset=utf-8
+
+Bring assignment 1 and 2. Class test Monday. No attachments required.
