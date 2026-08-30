@@ -1,0 +1,7 @@
+{
+  "pec.edu.in": {"age_days": 4000, "registrar": "campus", "note": "established college domain"},
+  "gmail.com": {"age_days": 7000, "registrar": "google", "note": "consumer mailbox"},
+  "paypa1.com": {"age_days": 4, "registrar": "unknown", "note": "lookalike, very new"},
+  "pec-edu.in": {"age_days": 6, "registrar": "unknown", "note": "lookalike of pec.edu.in"},
+  "mail-secure.net": {"age_days": 12, "registrar": "unknown", "note": "young throwaway-style domain"}
+}

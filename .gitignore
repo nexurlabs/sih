@@ -7,3 +7,5 @@ venv/
 *.egg-info/
 .idea/
 .vscode/
+data/mailtrace.db
+data/reports/

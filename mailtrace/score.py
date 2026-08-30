@@ -32,6 +32,11 @@ def fuse(parsed: dict[str, Any]) -> dict[str, Any]:
         score += 20
         reasons.append("Lookalike domain in the message (paypa1 / pec-edu style).")
 
+    intel = parsed.get("intel") or []
+    if any(x.get("young") for x in intel):
+        young = [x["domain"] for x in intel if x.get("young")]
+        score += 14
+        reasons.append("Young domain in offline cache: " + ", ".join(young))
     origin = parsed.get("origin") or {}
     if origin.get("kind") == "cloud":
         score += 10

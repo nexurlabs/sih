@@ -25,3 +25,22 @@ def test_spoof_and_twin_graph_keys():
     assert b["label"] in {"SPOOF", "PHISH"}
     assert b["score"] >= 55
     assert a["origin"]["city"] == "Frankfurt"
+    assert a["origin"]["lat"] == 50.1109
+
+
+def test_campaign_graph_and_pdf(tmp_path, monkeypatch):
+    from mailtrace.graph_store import build
+    from mailtrace.pdf_report import write_pdf
+    from mailtrace import pdf_report
+
+    monkeypatch.setattr(pdf_report, "OUT", tmp_path)
+    root = Path(__file__).resolve().parents[1] / "samples"
+    cases = []
+    for name in ("07_cloud_hops.eml", "08_campaign_twin.eml"):
+        p = parse_eml((root / name).read_bytes(), name)
+        cases.append({"id": name[:2], "parsed": p, "fusion": fuse(p)})
+    g = build(cases)
+    assert len(g["nodes"]) == 2
+    assert g["edges"]
+    path = write_pdf(cases[0])
+    assert path.exists() and path.stat().st_size > 400

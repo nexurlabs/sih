@@ -17,11 +17,11 @@ RECEIVED_IP_RE = re.compile(
 
 # Offline demo intel only — IPs we stamp into sample .eml files.
 GEO = {
-    "18.184.10.20": {"city": "Frankfurt", "isp": "AWS", "kind": "cloud"},
-    "52.94.76.10": {"city": "Dublin", "isp": "AWS", "kind": "cloud"},
-    "8.8.8.8": {"city": "unknown", "isp": "public-dns", "kind": "other"},
-    "103.25.60.12": {"city": "Chandigarh", "isp": "campus-like", "kind": "org"},
-    "185.199.108.153": {"city": "unknown", "isp": "fastly", "kind": "cdn"},
+    "18.184.10.20": {"city": "Frankfurt", "isp": "AWS", "kind": "cloud", "lat": 50.1109, "lon": 8.6821},
+    "52.94.76.10": {"city": "Dublin", "isp": "AWS", "kind": "cloud", "lat": 53.3498, "lon": -6.2603},
+    "8.8.8.8": {"city": "unknown", "isp": "public-dns", "kind": "other", "lat": None, "lon": None},
+    "103.25.60.12": {"city": "Chandigarh", "isp": "campus-like", "kind": "org", "lat": 30.7333, "lon": 76.7794},
+    "185.199.108.153": {"city": "unknown", "isp": "fastly", "kind": "cdn", "lat": None, "lon": None},
 }
 
 
@@ -67,11 +67,9 @@ def _hops(msg) -> list[dict[str, Any]]:
                 continue
             ip = cand
             break
-        geo = GEO.get(ip, {"city": "unknown", "isp": "unknown", "kind": "unknown"}) if ip else {
-            "city": "unknown",
-            "isp": "unknown",
-            "kind": "internal",
-        }
+        geo = GEO.get(ip) if ip else None
+        if not geo:
+            geo = {"city": "unknown", "isp": "unknown", "kind": "internal" if not ip else "unknown", "lat": None, "lon": None}
         hops.append(
             {
                 "index": i,
