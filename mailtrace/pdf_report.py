@@ -45,7 +45,27 @@ def write_pdf(case: dict[str, Any]) -> Path:
     c.setFont("Courier", 9)
     o = p.get("origin") or {}
     c.drawString(18 * mm, y, f"{o.get('ip')}  {o.get('city')}  {o.get('isp')}  {o.get('kind')}")
-    y -= 10 * mm
+    y -= 8 * mm
+    c.setFont("Times-Bold", 11)
+    c.drawString(18 * mm, y, "Hops")
+    y -= 5 * mm
+    c.setFont("Courier", 8)
+    for h in (p.get("hops") or [])[:8]:
+        c.drawString(18 * mm, y, f"{h.get('ip') or '-':15} {h.get('city') or ''} {h.get('isp') or ''}"[:95])
+        y -= 4 * mm
+    y -= 3 * mm
+    c.setFont("Times-Bold", 11)
+    c.drawString(18 * mm, y, "Campaign links")
+    y -= 5 * mm
+    c.setFont("Times-Roman", 9)
+    edges = (case.get("graph") or {}).get("edges") or []
+    if not edges:
+        c.drawString(18 * mm, y, "None yet. Analyse a second related .eml.")
+        y -= 4 * mm
+    for e in edges[:8]:
+        c.drawString(18 * mm, y, f"{e.get('from')} -- {e.get('to')}  {', '.join(e.get('shared') or [])}"[:100])
+        y -= 4 * mm
+    y -= 6 * mm
     c.setFont("Times-Bold", 11)
     c.drawString(18 * mm, y, "SHA-256 of this exact .eml")
     y -= 6 * mm

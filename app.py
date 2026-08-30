@@ -76,6 +76,7 @@ def case_pdf(case_id: str):
     case = load_case(case_id)
     if not case:
         raise HTTPException(404, "unknown case")
+    case["graph"] = build_graph(all_cases())
     path = write_pdf(case)
     return FileResponse(path, filename=f"mailtrace-{case_id}.pdf", media_type="application/pdf")
 

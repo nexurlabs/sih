@@ -74,7 +74,13 @@
       $("samples").onclick = (e) => { if (e.target.dataset.name) runSample(e.target.dataset.name); };
     }
     async function runSample(name) {
-      render(await (await fetch("/api/analyze-sample/" + encodeURIComponent(name), { method: "POST" })).json());
+      try {
+        const r = await fetch("/api/analyze-sample/" + encodeURIComponent(name), { method: "POST" });
+        if (!r.ok) throw new Error("analyze failed");
+        render(await r.json());
+      } catch (err) {
+        alert("Could not analyse sample. Is the server running?");
+      }
     }
     $("file").onchange = async (e) => {
       const f = e.target.files[0];
@@ -129,26 +135,30 @@
           <div>${esc(f.origin_note)}</div>
         </footer>`;
       requestAnimationFrame(() => {
-        drawMap(o);
+        drawMap(o, p.hops || []);
         drawNet(d.graph || { nodes: [], edges: [] }, d.id);
       });
       $("case").scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    function drawMap(o) {
+    function drawMap(o, hops) {
       const el = $("map");
       if (!el || !window.L) return;
       if (map) { map.remove(); map = null; }
-      const lat = o.lat, lon = o.lon;
       map = L.map(el, { zoomControl: false, attributionControl: false });
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18 }).addTo(map);
-      if (lat != null && lon != null) {
-        map.setView([lat, lon], 5);
-        L.circleMarker([lat, lon], { radius: 8, color: "#b33a2a", fillColor: "#b33a2a", fillOpacity: 1 })
+      const pts = (hops || []).filter((h) => h.lat != null && h.lon != null).map((h) => [h.lat, h.lon]);
+      if (o && o.lat != null && o.lon != null) {
+        map.setView([o.lat, o.lon], 5);
+        L.circleMarker([o.lat, o.lon], { radius: 9, color: "#b33a2a", fillColor: "#b33a2a", fillOpacity: 1 })
           .addTo(map)
           .bindPopup((o.city || "") + " · " + (o.isp || "") + " — hosting, not GPS");
+      } else if (pts.length) {
+        map.setView(pts[0], 4);
       } else {
         map.setView([20, 0], 2);
       }
+      pts.forEach((ll) => L.circleMarker(ll, { radius: 4, color: "#6b6358", fillOpacity: 0.7 }).addTo(map));
+      if (pts.length > 1) L.polyline(pts, { color: "#6b6358", weight: 1 }).addTo(map);
       setTimeout(() => map.invalidateSize(), 200);
     }
     function drawNet(g, current) {
