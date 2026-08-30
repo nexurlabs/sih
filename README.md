@@ -21,6 +21,17 @@ Open http://127.0.0.1:8000
 
 **Demo:** `04_spf_fail.eml`, then `07_cloud_hops.eml` + `08_campaign_twin.eml` (graph). Download PDF on the case.
 
+## SIH submission deck
+
+The editable six-slide deck is built from the provided SIH 2026 template:
+
+```bash
+python scripts/build_official_ppt.py
+soffice --headless --convert-to pdf --outdir docs docs/MailTrace_SIH26106.pptx
+```
+
+Upload `docs/MailTrace_SIH26106_idea.pdf`, not the PPTX. Fill the real portal Team ID and registered Team Name on slide 1 before uploading.
+
 ## Stack
 
 - FastAPI + Python email parser
