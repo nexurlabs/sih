@@ -44,3 +44,23 @@ def test_campaign_graph_and_pdf(tmp_path, monkeypatch):
     assert g["edges"]
     path = write_pdf(cases[0])
     assert path.exists() and path.stat().st_size > 400
+
+
+def test_demo_corpus_labels():
+    root = Path(__file__).resolve().parents[1] / "samples"
+    expected = {
+        "01_clean.eml": "CLEAN",
+        "02_display_spoof.eml": "SPOOF",
+        "03_lookalike.eml": "PHISH",
+        "04_spf_fail.eml": "SPOOF",
+        "05_bec_invoice.eml": "BEC",
+        "06_cred_phish.eml": "PHISH",
+        "07_cloud_hops.eml": "SPOOF",
+        "08_campaign_twin.eml": "SPOOF",
+    }
+    assert len(list(root.glob("*.eml"))) == 8
+    for name, label in expected.items():
+        p = parse_eml((root / name).read_bytes(), name)
+        out = fuse(p)
+        assert out["label"] == label
+        assert len(p["sha256"]) == 64

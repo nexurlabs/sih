@@ -58,10 +58,10 @@ def fuse(parsed: dict[str, Any]) -> dict[str, Any]:
     score = max(0, min(100, score))
     if score >= 70 and any("password" in r.lower() or "lookalike" in r.lower() for r in reasons):
         label = "phish"
-    elif score >= 55 and any("title" in r.lower() or "spf" in r.lower() or "reply-to" in r.lower() for r in reasons):
-        label = "spoof"
     elif score >= 50 and any("payment" in r.lower() or "bec" in r.lower() or "invoice" in r.lower() for r in reasons):
         label = "bec"
+    elif score >= 55 and any("title" in r.lower() or "spf" in r.lower() or "reply-to" in r.lower() for r in reasons):
+        label = "spoof"
     elif score >= 45:
         label = "spoof"
     else:
