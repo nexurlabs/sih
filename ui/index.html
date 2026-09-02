@@ -17,7 +17,7 @@
     .meta { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted); text-align: right; line-height: 1.5; }
     h1 { font-family: "Fraunces", serif; font-weight: 500; font-size: 32px; line-height: 1.15; letter-spacing: -.02em; }
     .drop { margin: 20px 0; border: 1px dashed #8a7f6e; padding: 28px; text-align: center; }
-    .samples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .samples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; justify-content: center; }
     button, .chip { font-family: "IBM Plex Mono", monospace; font-size: 11px; background: transparent; border: 1px solid var(--ink); padding: 6px 10px; cursor: pointer; color: var(--ink); }
     button:hover { background: #e8e0d2; }
     .title-row { display: grid; grid-template-columns: 1fr 148px; gap: 20px; margin: 12px 0 18px; }
@@ -28,8 +28,9 @@
     .fact { padding: 10px 16px 10px 0; }
     .fact + .fact { border-left: 1px solid var(--rule); padding-left: 16px; }
     .k { font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-    .v { font-size: 14px; }
+    .v { font-size: 14px; word-break: break-all; }
     .v.bad { color: var(--rust); }
+    .v.good { color: #2f5a3a; }
     .grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 28px; }
     h2 { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 12px 0 8px; }
     .reason { font-size: 15px; line-height: 1.45; padding: 8px 0; border-bottom: 1px solid var(--rule); }
@@ -40,10 +41,37 @@
     .ip { color: var(--muted); font-size: 12px; }
     #map { height: 200px; border: 1px solid var(--rule); background: #efe6d6; }
     #net { height: 280px; border: 1px solid var(--rule); background: #f7f1e6; }
-    .foot { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--ink); padding-top: 10px; margin-top: 18px; font-family: "IBM Plex Mono", monospace; font-size: 10px; color: var(--muted); word-break: break-all; }
+    .foot { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--ink); padding-top: 10px; margin-top: 18px; font-family: "IBM Plex Mono", monospace; font-size: 10px; color: var(--muted); word-break: break-all; }
     .hidden { display: none; }
     .sub { margin-top: 8px; font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); }
-    .actions { margin-top: 12px; display: flex; gap: 8px; }
+    .actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .pill { display: inline-block; border: 1px solid var(--rule); padding: 2px 8px; border-radius: 10px; font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .08em; }
+    .pill.bad { color: var(--rust); border-color: var(--rust); }
+    .pill.conflict { color: #8a5a00; border-color: #8a5a00; }
+    .pill.unknown { color: var(--muted); }
+    .pill.good { color: #2f5a3a; border-color: #2f5a3a; }
+    .err { color: var(--rust); border: 1px solid var(--rust); padding: 10px 14px; margin: 12px 0; font-family: "IBM Plex Mono", monospace; font-size: 12px; background: #fbeae6; }
+    .mapFallback { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted); padding: 8px 12px; background: #efe6d6; border: 1px solid var(--rule); }
+    .offlineHopList { font-family: "IBM Plex Mono", monospace; font-size: 11px; }
+    .offlineHopList li { margin-bottom: 4px; }
+    .graph-empty { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--muted); padding: 14px; }
+    .small { font-size: 11px; color: var(--muted); font-family: "IBM Plex Mono", monospace; }
+    .evidenceBox { border: 1px solid var(--rule); padding: 10px 12px; margin: 6px 0 12px; background: #f7f1e6; }
+    .evidenceBox summary { cursor: pointer; font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+    .evidenceBox pre { font-family: "IBM Plex Mono", monospace; font-size: 10px; white-space: pre-wrap; word-break: break-all; max-height: 240px; overflow: auto; margin-top: 8px; }
+    .assistBox { border: 1px solid var(--rule); padding: 10px 12px; margin: 6px 0 12px; background: #efe6d6; }
+    .assistBox .assistStatus { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--muted); }
+    .assistBox ul { margin: 6px 0 0 18px; font-size: 13px; line-height: 1.45; }
+    .assistBox li { margin-bottom: 4px; }
+    .assistBox.advisory { border-left: 3px solid #8a5a00; }
+    .assistBox.unavailable { border-left: 3px solid var(--muted); }
+    @media (max-width: 720px) {
+      .title-row { grid-template-columns: 1fr; }
+      .stamp { width: 110px; height: 110px; }
+      .facts { grid-template-columns: 1fr; }
+      .fact + .fact { border-left: none; border-top: 1px solid var(--rule); padding-left: 0; padding-top: 10px; }
+      .grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -55,112 +83,385 @@
     <section id="intake">
       <h1>Drop a saved email. Get a case file.</h1>
       <p class="sub">.eml upload or a demo sample. Origin = hosting city, not a person.</p>
-      <div class="drop">
+      <p id="modeNote" class="small hidden"></p>
+      <div class="drop" id="drop">
         <div>Upload .eml</div>
         <input id="file" type="file" accept=".eml,.txt,message/rfc822" />
         <div class="samples" id="samples"></div>
       </div>
+      <div id="error" class="hidden"></div>
     </section>
     <section id="case" class="hidden"></section>
   </article>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <script>
     const $ = (id) => document.getElementById(id);
+    const DEPLOY_PREFIXES = ["/mailtrace-private", "/mailtrace"];
+    const APP_BASE = DEPLOY_PREFIXES.find((prefix) => window.location.pathname === prefix || window.location.pathname.startsWith(`${prefix}/`)) || "";
+    const PUBLIC_DEMO = APP_BASE === "/mailtrace";
+    const apiUrl = (path) => `${APP_BASE}${path}`;
     let map, net;
-    async function loadSamples() {
-      const rows = await (await fetch("/api/samples")).json();
-      $("samples").innerHTML = rows.map((s) => `<button class="chip" data-name="${s.name}">${s.name}</button>`).join("");
-      $("samples").onclick = (e) => { if (e.target.dataset.name) runSample(e.target.dataset.name); };
+
+    if (PUBLIC_DEMO) {
+      $("file").disabled = true;
+      $("file").hidden = true;
+      $("drop").querySelector("div").textContent = "Choose a demo sample";
+      const note = $("modeNote");
+      note.classList.remove("hidden");
+      note.textContent = "Public read-only demo: sample analysis only; uploads, raw evidence, PDF downloads, and Qwen calls are disabled.";
     }
-    async function runSample(name) {
-      try {
-        const r = await fetch("/api/analyze-sample/" + encodeURIComponent(name), { method: "POST" });
-        if (!r.ok) throw new Error("analyze failed");
-        render(await r.json());
-      } catch (err) {
-        alert("Could not analyse sample. Is the server running?");
-      }
-    }
-    $("file").onchange = async (e) => {
-      const f = e.target.files[0];
-      if (!f) return;
-      const fd = new FormData();
-      fd.append("file", f, f.name);
-      render(await (await fetch("/api/analyze", { method: "POST", body: fd })).json());
-    };
+
     function esc(s) {
       return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
     }
+    function escSvg(s) {
+      return esc(s).replace(/'/g, "&#39;");
+    }
+
+    function showError(msg, hint) {
+      renderError(msg, hint);
+    }
+
+    function renderError(msg, hint) {
+      const el = $("error");
+      el.classList.remove("hidden");
+      el.className = "err";
+      el.innerHTML = `<b>Cannot analyse this upload.</b><br/>${esc(msg)}${hint ? `<br/><span class="small">${esc(hint)}</span>` : ""}`;
+      const cs = $("case");
+      if (cs) { cs.classList.add("hidden"); cs.innerHTML = ""; }
+    }
+
+    function clearError() {
+      const el = $("error");
+      el.classList.add("hidden");
+      el.innerHTML = "";
+    }
+
+    async function loadSamples() {
+      try {
+        const rows = await (await fetch(apiUrl("/api/samples"))).json();
+        $("samples").innerHTML = rows.map((s) => `<button class="chip" data-name="${esc(s.name)}">${esc(s.name)}</button>`).join("");
+        $("samples").onclick = (e) => { if (e.target.dataset && e.target.dataset.name) runSample(e.target.dataset.name); };
+      } catch (err) {
+        showError("Could not list samples.", "Is the server running on localhost?");
+      }
+    }
+
+    async function runSample(name) {
+      clearError();
+      try {
+        const endpoint = PUBLIC_DEMO ? "/api/demo/" : "/api/analyze-sample/";
+        const options = PUBLIC_DEMO ? {} : { method: "POST" };
+        const r = await fetch(apiUrl(endpoint + encodeURIComponent(name)), options);
+        if (!r.ok) {
+          const txt = await r.text().catch(() => "");
+          showError(`Sample ${name} returned HTTP ${r.status}.`, txt || "Reset state and try again.");
+          return;
+        }
+        render(await r.json());
+      } catch (err) {
+        showError("Could not analyse sample.", "Is the server running?");
+      }
+    }
+
+    async function uploadFile(f) {
+      if (PUBLIC_DEMO) {
+        showError("The public demo is read-only.", "Choose one of the bundled samples below.");
+        return;
+      }
+      if (!f) {
+        showError("No file selected.", "Choose a saved .eml and try again.");
+        return;
+      }
+      clearError();
+      const fd = new FormData();
+      fd.append("file", f, f.name || "upload.eml");
+      let r;
+      try {
+        r = await fetch(apiUrl("/api/analyze"), { method: "POST", body: fd });
+      } catch (err) {
+        showError("Upload failed.", "Could not reach the server. Is it running on localhost?");
+        return;
+      }
+      if (!r.ok) {
+        let body = "";
+        try { body = await r.text(); } catch (_) {}
+        if (r.status === 400) {
+          renderError("Empty or unreadable upload.", body || "Pick a real .eml with header + body.");
+        } else {
+          renderError(`Upload returned HTTP ${r.status}.`, body || "Server error.");
+        }
+        return;
+      }
+      render(await r.json());
+    }
+
+    $("file").onchange = (e) => uploadFile(e.target.files && e.target.files[0]);
+    // drag-and-drop (was missing before)
+    const dropEl = $("drop");
+    ["dragenter", "dragover"].forEach((ev) => dropEl.addEventListener(ev, (e) => { e.preventDefault(); dropEl.style.background = "#efe6d6"; }));
+    ["dragleave", "drop"].forEach((ev) => dropEl.addEventListener(ev, (e) => { e.preventDefault(); dropEl.style.background = ""; }));
+    dropEl.addEventListener("drop", (e) => {
+      const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) uploadFile(f);
+    });
+
+    function authPill(value, kind) {
+      const v = (value || "unknown").toLowerCase();
+      let cls = "pill";
+      if (v === "pass") cls += " good";
+      else if (v === "fail") cls += " bad";
+      else if (v === "conflict") cls += " conflict";
+      else cls += " unknown";
+      return `<span class="${cls}">${kind}: ${esc(value || "unknown")}</span>`;
+    }
+
+    function alignmentRow(al) {
+      if (!al) return "";
+      const cells = [];
+      const cls = (s) => s === "mismatch" ? "bad" : (s === "aligned" ? "good" : "");
+      cells.push(`<div><span class="k">From / Reply-To</span><div class="v ${cls(al.from_reply_to)}">${esc(al.from_reply_to)}</div></div>`);
+      cells.push(`<div><span class="k">From / Return-Path</span><div class="v ${cls(al.from_return_path)}">${esc(al.from_return_path)}</div></div>`);
+      cells.push(`<div><span class="k">Overall</span><div class="v ${cls(al.overall)}">${esc(al.overall)}</div></div>`);
+      return `<div class="facts">${cells.map((c) => `<div class="fact">${c}</div>`).join("")}</div>`;
+    }
+
+    function urlList(urls) {
+      if (!urls || !urls.length) return `<p class="reason">URL: none extracted.</p>`;
+      return urls.map((u) => `<p class="reason">URL: <code>${esc(u)}</code></p>`).join("");
+    }
+
+    function attachmentList(atts) {
+      if (!atts || !atts.length) return `<p class="reason">Attachments: none; metadata-only handling, never executed.</p>`;
+      return atts.map((a) => `<p class="reason">Attachment: <code>${esc(a.filename || "?")}</code> · ${esc(a.content_type || "?")} · ${esc(a.size)} bytes · risk ${esc(a.risk || "low")} · SHA-256 ${esc(a.sha256 || "?")}</p>`).join("");
+    }
+
+    function nlpBox(n) {
+      if (!n) return "";
+      return `
+        <h2>Local NLP (in score path)</h2>
+        <div class="assistBox advisory" data-nlp-status="${esc(n.status || "unknown")}">
+          <div class="assistStatus">${esc(n.status || "?")} · ${esc(n.model || "tfidf-logreg")} · ${esc(n.label || "clean")} · +${esc(n.points || 0)} pts</div>
+          <p class="small">${esc(n.note || "Bounded NLP component. Not a probability. Not Qwen.")}</p>
+        </div>`;
+    }
+
+    function liveAuthBox(live) {
+      if (!live) return "";
+      return `
+        <h2>Live DNS (SPF/DMARC TXT)</h2>
+        <div class="facts" data-section="liveDns">
+          <div class="fact"><div class="k">Enabled</div><div class="v small">${esc(live.enabled)}</div></div>
+          <div class="fact"><div class="k">SPF published</div><div class="v small">${esc(live.spf_published)}</div></div>
+          <div class="fact"><div class="k">DMARC published</div><div class="v small">${esc(live.dmarc_published)}</div></div>
+          <div class="fact"><div class="k">Hop in SPF</div><div class="v small">${esc(live.hop_in_spf)}</div></div>
+        </div>
+        <p class="small">${esc(live.note || "Published TXT only. Not DKIM crypto.")}</p>`;
+    }
+
+    function llmAssist(a) {
+      if (!a) return "";
+      const status = String(a.status || "unknown").toLowerCase();
+      const cls = status === "available" ? "advisory" : "unavailable";
+      const types = (a.threat_types || []).map((x) => `<span class="pill conflict">${esc(x)}</span>`).join(" ");
+      const observations = (a.observations || []).map((x) => `<li>${esc(x)}</li>`).join("");
+      const actions = (a.recommended_actions || []).map((x) => `<li>${esc(x)}</li>`).join("");
+      return `
+        <h2>Qwen analyst assist (advisory)</h2>
+        <div class="assistBox ${cls}" data-llm-status="${esc(status)}">
+          <div class="assistStatus">${esc(status)} · ${esc(a.provider || "groq")} · ${esc(a.model || "qwen/qwen3.8-27b")}</div>
+          ${types ? `<div style="margin-top:6px">${types}</div>` : ""}
+          ${observations ? `<div class="k" style="margin-top:8px">Observations</div><ul>${observations}</ul>` : ""}
+          ${actions ? `<div class="k" style="margin-top:8px">Recommended actions</div><ul>${actions}</ul>` : ""}
+          ${a.analyst_note ? `<p class="reason">${esc(a.analyst_note)}</p>` : ""}
+          <p class="small">${esc(a.note || "Advisory output; not a validated classifier and not the deterministic score.")}</p>
+        </div>`;
+    }
+
+    function evidenceCustody(evidence) {
+      if (!evidence) return `<p class="small">Evidence: not stored (no raw bytes).</p>`;
+      const events = (evidence.custody_events || []).map((e) => `${esc(e.action || "?")} @ ${esc(e.at || "?")} (${esc(e.actor || "?")})`).join(" · ");
+      const retention = evidence.retention || {};
+      const policy = retention.policy || "not configured";
+      const days = retention.days == null ? "not set" : `${retention.days} day(s)`;
+      const stored = evidence.stored ? "yes" : "no";
+      return `
+        <div class="evidenceBox">
+          <div><span class="k">Raw evidence stored</span><div class="v">${esc(stored)}</div></div>
+          <div><span class="k">Storage key</span><div class="v">${esc(evidence.storage_key || "-")}</div></div>
+          <div><span class="k">Retention policy</span><div class="v">${esc(policy)} (days: ${esc(days)})</div></div>
+          <div><span class="k">Custody events</span><div class="v small">${events || "none"}</div></div>
+          <p class="small">${esc(evidence.note || "Local prototype evidence trace; not legal-grade chain of custody.")}</p>
+        </div>`;
+    }
+
+    function provenanceAndUncertainty(p, f) {
+      const prov = p.provenance || {};
+      const unc = (f.uncertainty || []).concat(p.uncertainty || []);
+      const provRows = Object.entries(prov).map(([k, v]) => `<div><span class="k">${esc(k)}</span><div class="v small">${esc(v)}</div></div>`).join("");
+      const uncRows = unc.map((u) => `<p class="reason">Uncertainty: ${esc(u)}</p>`).join("");
+      return `
+        <h2>Provenance</h2>
+        <div class="facts">${provRows || '<div class="fact"><span class="k">none</span></div>'}</div>
+        <h2>Uncertainty and prototype boundary</h2>
+        ${uncRows || '<p class="reason">No uncertainty notes.</p>'}
+        <p class="small prototypeBoundary">${esc(f.origin_note || "")} SHA-256 is an integrity fingerprint, not a public blockchain or complete custody ledger. Header auth is always shown. Live DNS reads published SPF/DMARC TXT when enabled; it does not verify DKIM signatures. Origin geo is hosting context, not a person's location.</p>`;
+    }
+
     function render(d) {
-      const p = d.parsed, f = d.fusion, o = p.origin || {};
+      clearError();
+      const p = d.parsed || {};
+      const f = d.fusion || {};
+      const o = p.origin || {};
       const originIp = o.ip;
       const hops = (p.hops || []).map((h) => {
         const isO = originIp && h.ip === originIp;
-        return `<div class="hop"><div class="dot ${isO ? "origin" : ""}"></div><div><div class="who">${esc(h.raw || "")}</div><div class="ip">${esc(h.ip || "no ip")} · ${esc(h.city || "")} · ${esc(h.isp || "")}</div></div></div>`;
+        return `<div class="hop"><div class="dot ${isO ? "origin" : ""}"></div><div><div class="who">${esc(h.raw || "")}</div><div class="ip">${esc(h.ip || "no ip")} · ${esc(h.city || "")} · ${esc(h.isp || "")} · ${esc(h.status || "")} · ${esc(h.source || "")}</div></div></div>`;
       }).join("");
       const reasons = (f.reasons || []).map((x, i) => `<p class="reason">${i + 1}. ${esc(x)}</p>`).join("");
-      const intel = (p.intel || []).map((x) => `${x.domain}: ${x.age_days ?? "?"}d ${x.young ? "(young)" : ""}`).join(" · ");
+      const signals = (f.signals || []).map((s) => `<p class="reason small">+${esc(s.points || 0)} [${esc(s.code || "?")}] ${esc(s.reason || "")} <span class="small">(source: ${esc(s.source || "?")})</span></p>`).join("");
+      const intel = (p.intel || []).map((x) => `${esc(x.domain)}: ${x.age_days == null ? "?" : esc(x.age_days) + "d"} ${x.young ? "(young)" : ""} [${esc(x.status || "?")}]`).join(" · ");
+
+      const auth = p.auth || {};
+      const authPills = [
+        authPill(auth.spf, "SPF"),
+        authPill(auth.dkim, "DKIM"),
+        authPill(auth.dmarc, "DMARC"),
+      ].join(" ");
+      const conflictBadges = (auth.conflicts || []).map((c) => `<span class="pill conflict">conflict: ${esc(c)}</span>`).join(" ");
+      const caseActions = PUBLIC_DEMO
+        ? `<p class="small">Public demo: raw evidence and PDF downloads are disabled; this view does not persist a case.</p>`
+        : `<div class="actions"><a href="${apiUrl(`/api/case/${esc(d.id)}/pdf`)}" target="_blank" rel="noopener"><button type="button">Download case PDF</button></a>
+            <a href="${apiUrl(`/api/case/${esc(d.id)}/evidence`)}" target="_blank" rel="noopener"><button type="button">Raw .eml evidence</button></a></div>`;
+
       $("case").classList.remove("hidden");
       $("case").innerHTML = `
         <div class="title-row">
           <div>
-            <h1>${esc(f.label)} · ${esc(p.filename)}</h1>
-            <p class="sub">id ${esc(d.id)} · SPF ${esc(p.auth.spf)} · DKIM ${esc(p.auth.dkim)} · DMARC ${esc(p.auth.dmarc)}</p>
+            <h1>${esc(f.label || "?")} · ${esc(p.filename || "?")}</h1>
+            <p class="sub">id ${esc(d.id)} · ${authPills}</p>
+            ${conflictBadges ? `<p class="sub">${conflictBadges}</p>` : ""}
           </div>
-          <div class="stamp"><b>${f.score}</b><span>${esc(f.label)}</span></div>
+          <div class="stamp"><b>${esc(f.score || "?")}</b><span>${esc(f.label || "?")}</span></div>
         </div>
         <div class="facts">
-          <div class="fact"><div class="k">Claims to be</div><div class="v">${esc(p.from_display)} &lt;${esc(p.from_addr)}&gt;</div></div>
+          <div class="fact"><div class="k">Claims to be</div><div class="v">${esc(p.from_display || "")} &lt;${esc(p.from_addr || "")}&gt;</div></div>
           <div class="fact"><div class="k">Reply-To</div><div class="v ${p.reply_mismatch ? "bad" : ""}">${esc(p.reply_to || "—")}${p.reply_mismatch ? "  ≠  From" : ""}</div></div>
+          <div class="fact"><div class="k">Return-Path</div><div class="v">${esc(p.return_path || "—")}</div></div>
+          <div class="fact"><div class="k">Message-ID</div><div class="v small">${esc(p.message_id || "—")}</div></div>
         </div>
+        <h2>Header alignment</h2>
+        ${alignmentRow(p.alignment)}
         <div class="grid">
           <section>
-            <h2>Reasons</h2>${reasons}
+            <h2>Reasons</h2>${reasons || "<p class='reason'>No positive detection signals.</p>"}
+            ${signals ? `<h2>Signals (with source)</h2>${signals}` : ""}
+            ${nlpBox(f.nlp)}
+            ${llmAssist(f.llm_assist)}
             <h2>Offline domain cache</h2>
             <p class="reason">${esc(intel || "none")}</p>
-            <div class="actions"><a href="/api/case/${d.id}/pdf" target="_blank"><button type="button">Download case PDF</button></a></div>
+            ${caseActions}
           </section>
           <section>
             <h2>Received chain</h2>
             ${hops || "<p class='reason'>No Received hops.</p>"}
             <h2>Origin map</h2>
             <div id="map"></div>
+            <div id="mapFallback" class="mapFallback hidden">Map unavailable — CDN or tiles unreachable. Showing deterministic offline origin list.</div>
+            <ul class="offlineHopList" id="offlineHopList"></ul>
             <h2>Campaign graph</h2>
             <div id="net"></div>
           </section>
         </div>
+        <h2>URLs</h2>
+        ${urlList(p.urls)}
+        <h2>Attachments (metadata only, never executed)</h2>
+        ${attachmentList(p.attachments)}
+        <h2>Authentication evidence</h2>
+        <div class="facts" data-section="authSource">
+          <div class="fact" data-field="auth_source"><div class="k">Source</div><div class="v small">${esc(auth.source || "none-present")}</div></div>
+          <div class="fact" data-field="verificationMode"><div class="k">Verification mode</div><div class="v small">${esc(auth.verification_mode || "header-stated")}</div></div>
+          <div class="fact"><div class="k">Independent DKIM crypto</div><div class="v small">no</div></div>
+        </div>
+        ${liveAuthBox(p.live_auth)}
+        <details class="evidenceBox">
+          <summary>Raw authentication headers (from .eml)</summary>
+          <pre>${esc(auth.raw || "none")}</pre>
+        </details>
+        ${evidenceCustody(d.evidence)}
+        ${provenanceAndUncertainty(p, f)}
         <footer class="foot">
-          <div>SHA-256 ${esc(p.sha256)}</div>
-          <div>${esc(f.origin_note)}</div>
+          <div>SHA-256 ${esc(p.sha256 || "")}</div>
+          <div>${esc(f.origin_note || "")}</div>
+          <div>Prototype boundary: localhost analyst lab. Not legal-grade custody. Live DNS is TXT publication only. Not a person's location or identity.</div>
         </footer>`;
       requestAnimationFrame(() => {
         drawMap(o, p.hops || []);
+        drawOfflineHopList(p.hops || [], o);
         drawNet(d.graph || { nodes: [], edges: [] }, d.id);
       });
       $("case").scrollIntoView({ behavior: "smooth", block: "start" });
     }
+
     function drawMap(o, hops) {
       const el = $("map");
-      if (!el || !window.L) return;
-      if (map) { map.remove(); map = null; }
-      map = L.map(el, { zoomControl: false, attributionControl: false });
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18 }).addTo(map);
-      const pts = (hops || []).filter((h) => h.lat != null && h.lon != null).map((h) => [h.lat, h.lon]);
-      if (o && o.lat != null && o.lon != null) {
-        map.setView([o.lat, o.lon], 5);
-        L.circleMarker([o.lat, o.lon], { radius: 9, color: "#b33a2a", fillColor: "#b33a2a", fillOpacity: 1 })
-          .addTo(map)
-          .bindPopup((o.city || "") + " · " + (o.isp || "") + " — hosting, not GPS");
-      } else if (pts.length) {
-        map.setView(pts[0], 4);
-      } else {
-        map.setView([20, 0], 2);
+      const fb = $("mapFallback");
+      if (!el) return;
+      if (!window.L) {
+        if (fb) fb.classList.remove("hidden");
+        return;
       }
-      pts.forEach((ll) => L.circleMarker(ll, { radius: 4, color: "#6b6358", fillOpacity: 0.7 }).addTo(map));
-      if (pts.length > 1) L.polyline(pts, { color: "#6b6358", weight: 1 }).addTo(map);
-      setTimeout(() => map.invalidateSize(), 200);
+      let tileOk = false;
+      try {
+        if (map) { map.remove(); map = null; }
+        map = L.map(el, { zoomControl: false, attributionControl: false });
+        let tileError = false;
+        const tiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 18,
+          errorTileUrl: "",
+        });
+        tiles.on("tileerror", () => {
+          tileError = true;
+          if (fb) fb.classList.remove("hidden");
+        });
+        tiles.on("load", () => {
+          if (!tileError && fb) fb.classList.add("hidden");
+        });
+        tiles.addTo(map);
+        const pts = (hops || []).filter((h) => h.lat != null && h.lon != null).map((h) => [h.lat, h.lon]);
+        if (o && o.lat != null && o.lon != null) {
+          map.setView([o.lat, o.lon], 5);
+          L.circleMarker([o.lat, o.lon], { radius: 9, color: "#b33a2a", fillColor: "#b33a2a", fillOpacity: 1 })
+            .addTo(map)
+            .bindPopup((o.city || "") + " · " + (o.isp || "") + " — hosting, not GPS");
+          tileOk = true;
+        } else if (pts.length) {
+          map.setView(pts[0], 4);
+          tileOk = true;
+        } else {
+          map.setView([20, 0], 2);
+          tileOk = true;
+        }
+        pts.forEach((ll) => L.circleMarker(ll, { radius: 4, color: "#6b6358", fillOpacity: 0.7 }).addTo(map));
+        if (pts.length > 1) L.polyline(pts, { color: "#6b6358", weight: 1 }).addTo(map);
+        setTimeout(() => { try { map.invalidateSize(); } catch (_) {} }, 200);
+      } catch (err) {
+        tileOk = false;
+      }
+      if (!tileOk && fb) fb.classList.remove("hidden");
     }
+
+    function drawOfflineHopList(hops, origin) {
+      const el = $("offlineHopList");
+      if (!el) return;
+      const rows = (hops || []).filter((h) => h.ip).map((h) => {
+        const isO = origin && h.ip === origin.ip;
+        return `<li>${isO ? "★ " : ""}${esc(h.ip)} · ${esc(h.city || "unknown")} · ${esc(h.isp || "unknown")} · ${esc(h.status || "")}</li>`;
+      });
+      if (!rows.length) { el.innerHTML = ""; return; }
+      el.innerHTML = `<li class="small">Hop list (geo resolver + demo pins):</li>${rows.join("")}`;
+    }
+
     function drawNet(g, current) {
       const el = $("net");
       if (!el) return;
@@ -170,24 +471,37 @@
       allEdges.forEach((e) => { if (e.from === current || e.to === current) { connected.add(e.from); connected.add(e.to); } });
       const nodes = allNodes.filter((n) => connected.has(n.id));
       const edges = allEdges.filter((e) => connected.has(e.from) && connected.has(e.to));
-      if (!nodes.length) { el.innerHTML = '<div class="graph-empty">Analyse another .eml to reveal shared indicators.</div>'; return; }
+      if (!nodes.length) { el.innerHTML = '<div class="graph-empty">No shared indicators with this case yet. Analyse another .eml.</div>'; return; }
       const w = 900, h = 360, boxW = Math.min(270, Math.max(210, 720 / Math.max(nodes.length, 2))), boxH = 112;
       const gap = nodes.length > 1 ? (w - 2 * 80 - nodes.length * boxW) / (nodes.length - 1) : 0;
       const y = 120;
       const pos = new Map(nodes.map((n, i) => [n.id, { x: 80 + i * (boxW + gap), y }]));
-      const escSvg = (s) => esc(s).replace(/'/g, "&#39;");
-      const lineEls = edges.map((e, i) => {
+      // caption derived from API (edge.caption), wrapped to two lines
+      const wrap = (s, max) => {
+        s = String(s || "");
+        if (s.length <= max) return [s];
+        const mid = Math.floor(s.length / 2);
+        const cut = s.lastIndexOf(" + ", mid);
+        if (cut > 0 && cut < s.length - 1) return [s.slice(0, cut + 1), s.slice(cut + 3).trim()];
+        return [s.slice(0, mid), s.slice(mid)];
+      };
+      const lineEls = edges.map((e) => {
         const a = pos.get(e.from), b = pos.get(e.to); if (!a || !b) return '';
-        const x1=a.x+boxW, x2=b.x, cy=y+boxH/2;
-        const label=escSvg(e.caption || 'shared indicators');
-        return `<line x1="${x1}" y1="${cy}" x2="${x2}" y2="${cy}" stroke="#b33a2a" stroke-width="4"/><rect x="${(x1+x2)/2-92}" y="${cy-34}" width="184" height="62" fill="#f7f1e6" stroke="#c9bfb0"/><text x="${(x1+x2)/2}" y="${cy-7}" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" font-weight="500" fill="#1c1814">Reply-To + same hop</text><text x="${(x1+x2)/2}" y="${cy+13}" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" font-weight="500" fill="#1c1814">+ domain</text>`;
+        const x1 = a.x + boxW, x2 = b.x, cy = y + boxH / 2;
+        const capLines = wrap(e.caption || "shared indicators", 22);
+        const textEls = capLines.map((ln, i) => `<text class="graphCaption" data-edge="${escSvg(e.from)}--${escSvg(e.to)}" x="${(x1 + x2) / 2}" y="${cy - 7 + i * 18}" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" font-weight="500" fill="#1c1814">${escSvg(ln)}</text>`).join("");
+        return `<line x1="${x1}" y1="${cy}" x2="${x2}" y2="${cy}" stroke="#b33a2a" stroke-width="4"/><rect x="${(x1 + x2) / 2 - 92}" y="${cy - 34}" width="184" height="62" fill="#f7f1e6" stroke="#c9bfb0"/>${textEls}`;
       }).join('');
       const nodeEls = nodes.map((n) => {
-        const p=pos.get(n.id), active=n.id===current, parts=(n.label || n.id).split(' '), code=parts.shift() || '', name=parts.join(' ');
-        return `<g><rect x="${p.x}" y="${p.y}" width="${boxW}" height="${boxH}" fill="${active ? '#b33a2a' : '#f3eee4'}" stroke="${active ? '#b33a2a' : '#1c1814'}" stroke-width="2"/><text x="${p.x+18}" y="${p.y+30}" font-family="IBM Plex Mono" font-size="16" font-weight="500" fill="${active ? '#f7f1e6' : '#6b6358'}">${escSvg(code)}</text><text x="${p.x+18}" y="${p.y+60}" font-family="IBM Plex Sans" font-size="19" font-weight="500" fill="${active ? '#fffaf1' : '#1c1814'}">${escSvg(name)}</text><text x="${p.x+18}" y="${p.y+88}" font-family="IBM Plex Sans" font-size="14" fill="${active ? '#f7d8cf' : '#6b6358'}">analysed email</text></g>`;
+        const p = pos.get(n.id), active = n.id === current;
+        const parts = (n.label || n.id).split(' ');
+        const code = parts.shift() || '';
+        const name = parts.join(' ');
+        return `<g><rect x="${p.x}" y="${p.y}" width="${boxW}" height="${boxH}" fill="${active ? '#b33a2a' : '#f3eee4'}" stroke="${active ? '#b33a2a' : '#1c1814'}" stroke-width="2"/><text x="${p.x + 18}" y="${p.y + 30}" font-family="IBM Plex Mono" font-size="16" font-weight="500" fill="${active ? '#f7f1e6' : '#6b6358'}">${escSvg(code)}</text><text x="${p.x + 18}" y="${p.y + 60}" font-family="IBM Plex Sans" font-size="19" font-weight="500" fill="${active ? '#fffaf1' : '#1c1814'}">${escSvg(name)}</text><text x="${p.x + 18}" y="${p.y + 88}" font-family="IBM Plex Sans" font-size="14" fill="${active ? '#f7d8cf' : '#6b6358'}">analysed email</text></g>`;
       }).join('');
-      el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Campaign relationships graph">${lineEls}${nodeEls}<text x="${w/2}" y="42" text-anchor="middle" font-family="IBM Plex Mono" font-size="13" letter-spacing="2" fill="#6b6358">SHARED INDICATORS, NOT IDENTITY PROOF</text></svg>`;
+      el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Campaign relationships graph">${lineEls}${nodeEls}<text x="${w / 2}" y="42" text-anchor="middle" font-family="IBM Plex Mono" font-size="13" letter-spacing="2" fill="#6b6358">SHARED INDICATORS, NOT IDENTITY PROOF</text></svg>`;
     }
+
     loadSamples();
   </script>
 </body>

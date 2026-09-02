@@ -7,6 +7,7 @@ SIH does **not** want a public website for the idea round.
 - Institute picks **45 + 5 waitlist by looking at PPTs**
 - File to upload: `docs/MailTrace_SIH26106_idea.pdf` (**6 slides, final PDF**)
 - Editable twin: `docs/MailTrace_SIH26106.pptx`
+- Canonical export path: `docs/MailTrace_SIH26106_idea.pdf` (generated from that PPTX)
 - The PDF follows the official six sections: title/team, idea/innovation, technical approach, feasibility, impact, research.
 - **Before upload:** replace `[ENTER PORTAL TEAM ID]` and `[ENTER REGISTERED TEAM NAME]` on slide 1 with the portal values.
 - **Leader-only Google Form due 31 Aug 2026, 23:59**

@@ -28,13 +28,23 @@ def _short(filename: str) -> str:
 
 def _edge_caption(shared: list[str]) -> str:
     bits = []
-    if any(s.startswith("rt:") for s in shared):
-        bits.append("Reply-To")
-    if any(s.startswith("ip:") for s in shared):
-        bits.append("same hop")
-    if any(s.startswith("dom:") for s in shared):
-        bits.append("domain")
+    for key in shared:
+        kind, _, value = key.partition(":")
+        if kind == "rt":
+            bits.append(f"Reply-To: {value}")
+        elif kind == "ip":
+            bits.append(f"same hop: {value}")
+        elif kind == "dom":
+            bits.append(f"domain: {value}")
     return " + ".join(bits) or "linked"
+
+
+def _is_meaningful(shared: list[str]) -> bool:
+    """Require a specific or composite indicator; never link on IP alone."""
+    if any(key.startswith("rt:") for key in shared):
+        return True
+    non_ip = [key for key in shared if not key.startswith("ip:")]
+    return len(non_ip) >= 2
 
 
 def latest_by_filename(cases: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -44,7 +54,7 @@ def latest_by_filename(cases: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return list(by.values())
 
 
-def build(cases: list[dict[str, Any]]) -> dict[str, Any]:
+def build(cases: list[dict[str, Any]], focus_id: str | None = None) -> dict[str, Any]:
     cases = latest_by_filename(cases)
     g = nx.Graph()
     for c in cases:
@@ -57,9 +67,23 @@ def build(cases: list[dict[str, Any]]) -> dict[str, Any]:
         ka = _keys(a["parsed"])
         for b in cases[i + 1 :]:
             shared = sorted(ka & _keys(b["parsed"]))
-            if shared:
-                g.add_edge(a["id"], b["id"], shared=shared[:4], caption=_edge_caption(shared))
+            if _is_meaningful(shared):
+                g.add_edge(
+                    a["id"],
+                    b["id"],
+                    shared=shared[:6],
+                    caption=_edge_caption(shared),
+                    strength="strong" if any(key.startswith("rt:") for key in shared) else "composite",
+                    relation="campaign-candidate",
+                )
+    if focus_id is not None:
+        if focus_id in g:
+            visible = {focus_id, *g.neighbors(focus_id)}
+            g = g.subgraph(visible).copy()
+        else:
+            g = nx.Graph()
     return {
+        "note": "Shared indicators form a campaign candidate; they do not prove common control, identity, or responsibility.",
         "nodes": [{"id": n, **g.nodes[n]} for n in g.nodes],
         "edges": [
             {
@@ -67,6 +91,8 @@ def build(cases: list[dict[str, Any]]) -> dict[str, Any]:
                 "to": v,
                 "shared": data.get("shared", []),
                 "caption": data.get("caption", "linked"),
+                "strength": data.get("strength", "unknown"),
+                "relation": data.get("relation", "campaign-candidate"),
             }
             for u, v, data in g.edges(data=True)
         ],

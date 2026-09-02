@@ -17,7 +17,14 @@ def lookup_domains(*domains: str) -> list[dict[str, Any]]:
         if not d or d in seen:
             continue
         seen.add(d)
+        cached = d in data
         row = data.get(d, {"age_days": None, "registrar": "unknown", "note": "not in offline cache"})
         young = isinstance(row.get("age_days"), int) and row["age_days"] < 30
-        out.append({"domain": d, **row, "young": young})
+        out.append({
+            "domain": d,
+            **row,
+            "young": young,
+            "source": "offline-cache",
+            "status": "known" if cached else "unknown",
+        })
     return out

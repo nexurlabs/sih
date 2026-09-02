@@ -256,7 +256,7 @@ story += [para("The visible graph is currently a custom inline SVG because raw n
 story += [para("11. Local storage", "H1MT")]
 story += [para("Cases are saved in data/mailtrace.db. The database contains the case ID, filename, SHA-256, parsed JSON payload and creation time. It persists across server restarts.")]
 story += [para("Restarting the server does not clear old cases. Use the reset endpoint before a clean campaign demonstration:")]
-story += [code("curl -X POST http://127.0.0.1:8000/api/reset")]
+story += [code("curl -X POST http://127.0.0.1:8777/api/reset")]
 
 story += [para("12. Forensic PDF", "H1MT")]
 story += [para("The case PDF is a one-page A4 summary containing the case ID, score, label, sender, Reply-To, reasons, origin hop, up to eight Received hops, campaign links, exact-file SHA-256 and the hosting-not-GPS disclaimer.")]
@@ -282,8 +282,8 @@ sample_rows = [
 story += [table(sample_rows, [40 * mm, 30 * mm, 109 * mm])]
 
 story += [para("15. How to start it", "H1MT")]
-story += [code("cd /root/sih-mailtrace\n\n# easiest path\nbash run.sh\n\n# or manually\npython3 scripts/write_samples.py\npython3 -m pytest -q\npython3 -m uvicorn app:app --host 127.0.0.1 --port 8000")]
-story += [para("Open http://127.0.0.1:8000. The run script installs requirements, regenerates samples, runs tests and starts Uvicorn on localhost port 8000.")]
+story += [code("cd /root/sih-mailtrace\n\n# easiest path\nbash run.sh\n\n# or manually\npython3 scripts/write_samples.py\npython3 -m pytest -q\npython3 -m uvicorn app:app --host 127.0.0.1 --port 8777")]
+story += [para("Open http://127.0.0.1:8777. The run script installs requirements, regenerates samples, runs tests and starts Uvicorn on localhost port 8777.")]
 
 story += [para("16. Best click-by-click test", "H1MT")]
 for i, item in enumerate([
@@ -315,7 +315,7 @@ api_rows = [
 ]
 story += [table(api_rows, [38 * mm, 86 * mm, 55 * mm])]
 story += [para("Useful direct commands:")]
-story += [code("curl http://127.0.0.1:8000/api/health\ncurl http://127.0.0.1:8000/api/samples\ncurl -X POST http://127.0.0.1:8000/api/analyze-sample/04_spf_fail.eml\ncurl -F \"file=@samples/05_bec_invoice.eml\" http://127.0.0.1:8000/api/analyze\npython3 -m pytest -q")]
+story += [code("curl http://127.0.0.1:8777/api/health\ncurl http://127.0.0.1:8777/api/samples\ncurl -X POST http://127.0.0.1:8777/api/analyze-sample/04_spf_fail.eml\ncurl -F \"file=@samples/05_bec_invoice.eml\" http://127.0.0.1:8777/api/analyze\npython3 -m pytest -q")]
 
 story += [para("18. Current verified result", "H1MT")]
 for item in [

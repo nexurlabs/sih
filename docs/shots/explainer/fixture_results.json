@@ -1,0 +1,42 @@
+[
+  {
+    "filename": "01_clean.eml",
+    "score": 8,
+    "label": "CLEAN"
+  },
+  {
+    "filename": "02_display_spoof.eml",
+    "score": 100,
+    "label": "SPOOF"
+  },
+  {
+    "filename": "03_lookalike.eml",
+    "score": 98,
+    "label": "PHISH"
+  },
+  {
+    "filename": "04_spf_fail.eml",
+    "score": 64,
+    "label": "SPOOF"
+  },
+  {
+    "filename": "05_bec_invoice.eml",
+    "score": 100,
+    "label": "BEC"
+  },
+  {
+    "filename": "06_cred_phish.eml",
+    "score": 100,
+    "label": "PHISH"
+  },
+  {
+    "filename": "07_cloud_hops.eml",
+    "score": 66,
+    "label": "SPOOF"
+  },
+  {
+    "filename": "08_campaign_twin.eml",
+    "score": 66,
+    "label": "SPOOF"
+  }
+]

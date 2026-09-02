@@ -2,6 +2,10 @@
 """Fill the user-provided SIH 2026 idea template without text overflow."""
 from __future__ import annotations
 
+import os
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
 
 from pptx import Presentation
@@ -14,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / 'docs' / 'SIH2026-IDEA-Presentation-Format.pptx'
 CACHE_TEMPLATE = Path('/root/.hermes/cache/documents/doc_aee6b1a033e8_SIH2026-IDEA-Presentation-Format.pptx')
 OUT = ROOT / 'docs' / 'MailTrace_SIH26106.pptx'
+PDF_OUT = ROOT / 'docs' / 'MailTrace_SIH26106_idea.pdf'
 SHOTS = ROOT / 'docs' / 'shots'
 
 # The SIH template is 13.333 x 7.5 inches. Keep all new content inside the
@@ -59,7 +64,7 @@ def set_shape_text(shape, value: str, size: int = 10, color=NAVY, bold=False):
     run.font.color.rgb = color
 
 
-def add_text(slide, x, y, w, h, value, size=12, color=NAVY, bold=False,
+def add_text(slide, x, y, w, h, value, size: float = 12, color=NAVY, bold=False,
              font='Arial', align=PP_ALIGN.LEFT, valign=MSO_ANCHOR.TOP,
              margin=0.04, italic=False):
     shape = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
@@ -189,7 +194,7 @@ def clean_template(pres: Presentation) -> None:
                 set_shape_text(shape, str(idx), 9, WHITE, False)
 
 
-def title_slide(slide):
+def title_slide(slide, portal_title: str, team_id: str, team_name: str):
     remove_text_containing(slide, ('TITLE PAGE', 'SMART INDIA HACKATHON 2026'))
     add_text(slide, 0.55, 0.55, 6.3, 0.38, 'SMART INDIA HACKATHON 2026', 18, BLUE, True, 'Georgia', margin=0)
     add_text(slide, 0.55, 1.05, 5.95, 0.52, 'MailTrace', 30, NAVY, True, 'Georgia', margin=0)
@@ -200,11 +205,11 @@ def title_slide(slide):
     # Keep all required title-page fields in one bounded left-hand column.
     fields = [
         ('PROBLEM STATEMENT ID', 'SIH26106'),
-        ('PROBLEM STATEMENT TITLE', 'AI-Powered Email Threat Detection, GeoLocation and Forensic Intelligence Platform'),
+        ('PROBLEM STATEMENT TITLE', portal_title),
         ('THEME', 'Blockchain & Cybersecurity'),
         ('PS CATEGORY', 'Software'),
-        ('TEAM ID', '[ENTER PORTAL TEAM ID]'),
-        ('TEAM NAME', '[ENTER REGISTERED TEAM NAME]'),
+        ('TEAM ID', team_id),
+        ('TEAM NAME', team_name),
     ]
     y = 2.72
     for key, value in fields:
@@ -214,9 +219,7 @@ def title_slide(slide):
 
 
 def slide2(slide):
-    remove_text_containing(slide, ('IDEA TITLE',))
-    add_text(slide, 0.55, 0.55, 12.0, 0.36, 'From one suspicious message to a connected case file.', 18, NAVY, True, 'Georgia', margin=0)
-    add_text(slide, 0.55, 0.98, 12.0, 0.28, 'MailTrace combines detection, origin context and campaign correlation in one analyst workflow.', 10.5, MUTED, margin=0)
+    add_text(slide, 0.55, 1.08, 12.0, 0.20, 'From one suspicious message to a connected case file.', 9.5, NAVY, True, 'Arial', margin=0)
     add_label(slide, 0.55, 1.38, 'Proposed solution')
     xs = [0.55, 3.45, 6.35, 9.25]
     content = [
@@ -249,9 +252,7 @@ def slide2(slide):
 
 
 def slide3(slide):
-    remove_text_containing(slide, ('TECHNICAL APPROACH',))
-    add_text(slide, 0.55, 0.55, 12.0, 0.36, 'Evidence pipeline: small, explainable modules.', 18, NAVY, True, 'Georgia', margin=0)
-    add_text(slide, 0.55, 0.98, 12.0, 0.28, 'The working prototype is deterministic first; NLP is one supporting signal, not the whole product.', 10.5, MUTED, margin=0)
+    add_text(slide, 0.55, 1.08, 12.0, 0.20, 'Evidence pipeline: small, explainable modules.', 9.5, NAVY, True, 'Arial', margin=0)
     add_label(slide, 0.55, 1.38, 'Methodology')
     modules = [
         ('01  .EML', 'raw bytes + SHA-256', BLUE),
@@ -282,9 +283,7 @@ def slide3(slide):
 
 
 def slide4(slide):
-    remove_text_containing(slide, ('FEASIBILITY AND VIABILITY',))
-    add_text(slide, 0.55, 0.55, 12.0, 0.36, 'Feasible now; harden the edges as adoption grows.', 18, NAVY, True, 'Georgia', margin=0)
-    add_text(slide, 0.55, 0.98, 12.0, 0.28, 'The first version runs on a laptop and avoids fragile live dependencies. The production path is modular.', 10.5, MUTED, margin=0)
+    add_text(slide, 0.55, 1.08, 12.0, 0.20, 'Feasible now; harden the edges as adoption grows.', 9.5, NAVY, True, 'Arial', margin=0)
     add_label(slide, 0.55, 1.38, 'Feasibility')
     add_panel(slide, 0.55, 1.72, 5.85, 2.28, PALE_BLUE, RULE)
     add_text(slide, 0.80, 1.96, 5.3, 0.23, 'NOW  /  IDEA-ROUND PROTOTYPE', 10, BLUE, True, 'Arial', margin=0)
@@ -307,7 +306,7 @@ def slide4(slide):
     add_text(slide, 0.78, 4.75, 2.3, 0.18, 'RISK', 8, BLUE, True, 'Arial', margin=0)
     add_text(slide, 3.05, 4.75, 9.2, 0.18, 'MITIGATION', 8, BLUE, True, 'Arial', margin=0)
     rows = [
-        ('Headers may be forged', 'Show confidence; preserve raw evidence; never call a lead proof.'),
+        ('Headers may be forged', 'Show uncertainty and raw evidence; never call a lead proof.'),
         ('IP geo is not a person', 'Report hosting city/ISP only; explicitly reject GPS attribution.'),
         ('Email is sensitive', 'Local-first workflow; no Gmail ingest; future masking and retention controls.'),
     ]
@@ -321,9 +320,7 @@ def slide4(slide):
 
 
 def slide5(slide):
-    remove_text_containing(slide, ('IMPACT AND BENEFITS',))
-    add_text(slide, 0.55, 0.55, 12.0, 0.36, 'Impact: turn a vague warning into an actionable case.', 18, NAVY, True, 'Georgia', margin=0)
-    add_text(slide, 0.55, 0.98, 12.0, 0.28, 'MailTrace helps people explain what happened, preserve evidence and decide what to do next.', 10.5, MUTED, margin=0)
+    add_text(slide, 0.55, 1.08, 12.0, 0.20, 'Impact: turn a vague warning into an actionable case.', 9.5, NAVY, True, 'Arial', margin=0)
     add_label(slide, 0.55, 1.38, 'Analyst difference')
     add_panel(slide, 0.55, 1.72, 3.35, 1.48, PALE_BLUE, RULE)
     add_text(slide, 0.78, 1.98, 2.8, 0.18, 'FILTER', 9, BLUE, True, 'Arial', margin=0)
@@ -332,7 +329,7 @@ def slide5(slide):
     add_connector(slide, 4.05, 2.47, 4.62, 2.47, RUST, 2.5)
     add_panel(slide, 4.88, 1.62, 7.82, 1.68, PALE_RUST, RUST)
     add_text(slide, 5.15, 1.90, 7.15, 0.18, 'MAILTRACE CASE FILE', 9, RUST, True, 'Arial', margin=0)
-    add_text(slide, 5.15, 2.25, 7.15, 0.25, 'SPF fail  ·  Reply-To mismatch  ·  earliest hop', 11.5, NAVY, True, 'Arial', margin=0)
+    add_text(slide, 5.15, 2.25, 7.15, 0.25, 'SPF/DKIM/DMARC fail  ·  header evidence  ·  earliest hop', 11.5, NAVY, True, 'Arial', margin=0)
     add_text(slide, 5.15, 2.62, 7.15, 0.20, 'Frankfurt / AWS  ·  related case 08  ·  SHA-256', 9.2, MUTED, margin=0)
     add_label(slide, 0.55, 3.63, 'Target users and value', BLUE, 2.8)
     add_panel(slide, 0.55, 3.92, 12.15, 1.22, PAPER, RULE)
@@ -353,13 +350,12 @@ def slide5(slide):
 
 
 def slide6(slide):
-    remove_text_containing(slide, ('RESEARCH', 'Details / Links'))
-    add_text(slide, 0.55, 0.55, 12.0, 0.36, 'Research basis and implementation references.', 18, NAVY, True, 'Georgia', margin=0)
-    add_text(slide, 0.55, 0.98, 12.0, 0.28, 'The prototype maps directly to SIH26106 while keeping attribution and privacy claims bounded.', 10.5, MUTED, margin=0)
+    remove_text_containing(slide, ('Details / Links',))
+    add_text(slide, 0.55, 1.08, 12.0, 0.20, 'Research basis and implementation references.', 9.5, NAVY, True, 'Arial', margin=0)
     add_label(slide, 0.55, 1.38, 'Problem + standards', BLUE, 2.6)
     add_panel(slide, 0.55, 1.68, 5.85, 2.65, PAPER, RULE)
     add_text(slide, 0.78, 1.92, 5.3, 0.20, 'SIH26106', 9, RUST, True, 'Arial', margin=0)
-    add_text(slide, 1.98, 1.92, 4.05, 0.52, 'Official PS: NLP/ML detection, header forensics, IP geo, domain intelligence, graph correlation and forensic reporting.', 8.5, NAVY, margin=0)
+    add_text(slide, 1.98, 1.92, 4.05, 0.68, 'Target scope: NLP/ML detection, header/origin forensics, domain intelligence, graph correlation and reporting. Hybrid score: forensic header rules plus a bounded local NLP component; optional Groq Qwen3.8-27B output is redacted, advisory-only, disabled by default, and not a validated detector.', 7.4, NAVY, margin=0)
     add_text(slide, 0.78, 2.65, 5.3, 0.20, 'RFC 5322', 9, RUST, True, 'Arial', margin=0)
     add_text(slide, 1.98, 2.65, 4.05, 0.40, 'Internet Message Format: structured headers, message IDs and Received fields.', 8.5, NAVY, margin=0)
     add_text(slide, 0.78, 3.32, 5.3, 0.20, 'RFC 7208 / 6376 / 7489', 9, RUST, True, 'Arial', margin=0)
@@ -376,19 +372,68 @@ def slide6(slide):
     add_panel(slide, 0.55, 4.76, 12.15, 0.82, PALE_BLUE, RULE)
     add_compact_bullets(slide, 0.80, 4.91, 11.6, [
         'Local crafted .eml files only; no Gmail/Outlook ingest and no real phishing messages.',
-        'Geo output is hosting infrastructure with confidence, never the exact location of a person.',
+        'Geo output is hosting infrastructure with stated uncertainty, never the exact location of a person.',
         'Evidence hash is an integrity fingerprint, not a public blockchain or cryptocurrency ledger.',
     ], 7.4, 0.22)
     add_text(slide, 0.55, 5.78, 12.0, 0.16, 'Source links: sih.gov.in/sih2026PS  ·  rfc-editor.org  ·  docs.python.org  ·  networkx.org  ·  leafletjs.com', 7.2, MUTED, margin=0)
 
 
-def main():
+def submission_metadata() -> tuple[str, str, str]:
+    values = {
+        "team id": os.environ.get("MAILTRACE_TEAM_ID", "").strip(),
+        "registered team name": os.environ.get("MAILTRACE_TEAM_NAME", "").strip(),
+        "portal title": os.environ.get("MAILTRACE_PORTAL_TITLE", "").strip(),
+    }
+    missing = [label for label, value in values.items() if not value]
+    placeholders = [
+        label for label, value in values.items()
+        if value and ("placeholder" in value.lower() or "[enter " in value.lower())
+    ]
+    if missing or placeholders:
+        problems = missing + [f"{label} placeholder" for label in placeholders]
+        raise SystemExit(
+            "refusing to generate an upload candidate: provide real "
+            + ", ".join(problems)
+            + " via MAILTRACE_TEAM_ID, MAILTRACE_TEAM_NAME, and MAILTRACE_PORTAL_TITLE"
+        )
+    return values["portal title"], values["team id"], values["registered team name"]
+
+
+def export_canonical_pdf(pptx_path: Path | None = None, pdf_path: Path | None = None) -> Path:
+    source = Path(pptx_path or OUT)
+    target = Path(pdf_path or PDF_OUT)
+    if not source.is_file():
+        raise SystemExit(f"cannot export missing editable deck: {source}")
+    converter = shutil.which("soffice") or shutil.which("libreoffice")
+    if not converter:
+        raise SystemExit("cannot export PDF: soffice/libreoffice is not installed")
+    with tempfile.TemporaryDirectory(prefix="mailtrace-pdf-") as temp_dir:
+        try:
+            subprocess.run(
+                [converter, "--headless", "--convert-to", "pdf", "--outdir", temp_dir, str(source)],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise SystemExit("LibreOffice could not export the editable deck") from exc
+        converted = Path(temp_dir) / f"{source.stem}.pdf"
+        if not converted.is_file():
+            raise SystemExit("LibreOffice completed without producing a PDF")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        converted.replace(target)
+    return target
+
+
+def main(export_pdf: bool = False):
+    portal_title, team_id, team_name = submission_metadata()
     template = TEMPLATE if TEMPLATE.exists() else CACHE_TEMPLATE
     if not template.exists():
         raise SystemExit(f'missing SIH 2026 template: {TEMPLATE}')
     pres = Presentation(str(template))
     clean_template(pres)
-    title_slide(pres.slides[0])
+    title_slide(pres.slides[0], portal_title, team_id, team_name)
     slide2(pres.slides[1])
     slide3(pres.slides[2])
     slide4(pres.slides[3])
@@ -399,7 +444,17 @@ def main():
     pres.core_properties.author = 'MailTrace team'
     pres.save(str(OUT))
     print('wrote', OUT)
+    if export_pdf:
+        print('wrote', export_canonical_pdf())
 
 
 if __name__ == '__main__':
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        '--export-pdf',
+        action='store_true',
+        help=f'convert the editable deck to the canonical {PDF_OUT.name}',
+    )
+    main(export_pdf=parser.parse_args().export_pdf)

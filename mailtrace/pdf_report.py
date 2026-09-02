@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import textwrap
 from typing import Any
 
 from reportlab.lib.pagesizes import A4
@@ -18,62 +19,172 @@ def write_pdf(case: dict[str, Any]) -> Path:
     f = case["fusion"]
     c = canvas.Canvas(str(path), pagesize=A4)
     w, h = A4
-    y = h - 22 * mm
-    c.setFont("Times-Bold", 18)
-    c.drawString(18 * mm, y, "MailTrace case file")
-    y -= 8 * mm
-    c.setFont("Courier", 9)
-    c.drawString(18 * mm, y, f"id {case['id']}   {f['label']}   score {f['score']}")
-    y -= 6 * mm
-    c.drawString(18 * mm, y, f"file {p['filename']}")
-    y -= 6 * mm
-    c.drawString(18 * mm, y, f"from {p.get('from_display','')} <{p.get('from_addr','')}>")
-    y -= 5 * mm
-    c.drawString(18 * mm, y, f"reply-to {p.get('reply_to') or '-'}")
-    y -= 8 * mm
-    c.setFont("Times-Bold", 11)
-    c.drawString(18 * mm, y, "Reasons")
-    y -= 6 * mm
-    c.setFont("Times-Roman", 10)
-    for r in f.get("reasons") or []:
-        c.drawString(18 * mm, y, f"- {r[:110]}")
+    left = 18 * mm
+    top = h - 18 * mm
+    bottom = 18 * mm
+    y = top
+
+    def new_page() -> None:
+        nonlocal y
+        c.showPage()
+        y = top
+
+    def write_lines(value: Any, size: int = 9, font: str = "Times-Roman", gap: float = 4.5) -> None:
+        nonlocal y
+        text = str(value if value is not None else "") or "-"
+        lines = textwrap.wrap(text, width=105, break_long_words=True, break_on_hyphens=False) or [""]
+        needed = len(lines) * gap
+        if y - needed < bottom:
+            new_page()
+        c.setFont(font, size)
+        for line in lines:
+            c.drawString(left, y, line)
+            y -= gap
+
+    def heading(value: str) -> None:
+        nonlocal y
+        if y - 8 * mm < bottom:
+            new_page()
+        y -= 2 * mm
+        c.setFont("Times-Bold", 11)
+        c.drawString(left, y, value)
         y -= 5 * mm
-    y -= 4 * mm
-    c.setFont("Times-Bold", 11)
-    c.drawString(18 * mm, y, "Origin hop")
-    y -= 6 * mm
-    c.setFont("Courier", 9)
-    o = p.get("origin") or {}
-    c.drawString(18 * mm, y, f"{o.get('ip')}  {o.get('city')}  {o.get('isp')}  {o.get('kind')}")
+
+    def field(label: str, value: Any, font: str = "Courier", size: int = 8) -> None:
+        write_lines(f"{label}: {value if value not in (None, '') else 'unknown'}", size, font, 4.2)
+
+    c.setFont("Times-Bold", 18)
+    c.drawString(left, y, "MailTrace case file")
     y -= 8 * mm
-    c.setFont("Times-Bold", 11)
-    c.drawString(18 * mm, y, "Hops")
-    y -= 5 * mm
-    c.setFont("Courier", 8)
-    for h in (p.get("hops") or [])[:8]:
-        c.drawString(18 * mm, y, f"{h.get('ip') or '-':15} {h.get('city') or ''} {h.get('isp') or ''}"[:95])
-        y -= 4 * mm
-    y -= 3 * mm
-    c.setFont("Times-Bold", 11)
-    c.drawString(18 * mm, y, "Campaign links")
-    y -= 5 * mm
-    c.setFont("Times-Roman", 9)
-    edges = (case.get("graph") or {}).get("edges") or []
+    write_lines(f"id {case['id']}   {f.get('label', 'UNKNOWN')}   score {f.get('score', '?')}", 9, "Courier", 5)
+    field("Evidence file", p.get("filename"))
+    field("Evidence size", f"{p.get('size', '?')} bytes")
+    field("SHA-256", p.get("sha256"))
+    evidence = case.get("evidence") or {}
+    field("Raw evidence stored", "yes" if evidence.get("stored") else "unknown/not stored")
+    field("Evidence storage key", evidence.get("storage_key"))
+
+    heading("Sender and header evidence")
+    field("Subject", p.get("subject"), "Times-Roman", 9)
+    field("From", f"{p.get('from_display', '')} <{p.get('from_addr', '')}>")
+    field("Reply-To", p.get("reply_to"))
+    field("Return-Path", p.get("return_path"))
+    field("Message-ID", p.get("message_id"))
+    alignment = p.get("alignment") or {}
+    field("From/Reply-To alignment", alignment.get("from_reply_to"))
+    field("From/Return-Path alignment", alignment.get("from_return_path"))
+    field("Overall alignment", alignment.get("overall"))
+
+    heading("Authentication evidence")
+    auth = p.get("auth") or {}
+    field("Header SPF", auth.get("spf"))
+    field("Header DKIM", auth.get("dkim"))
+    field("Header DMARC", auth.get("dmarc"))
+    field("Authentication source", auth.get("source"))
+    field("Verification mode", auth.get("verification_mode"))
+    field("Independent DKIM crypto", "no")
+    live = p.get("live_auth") or {}
+    field("Live DNS enabled", live.get("enabled"))
+    field("Live SPF published", live.get("spf_published"))
+    field("Live DMARC published", live.get("dmarc_published"))
+    field("Live hop in SPF record", live.get("hop_in_spf"))
+    field("Live SPF TXT", live.get("spf_txt"))
+    field("Live DMARC TXT", live.get("dmarc_txt"))
+    field("Raw authentication headers", auth.get("raw"))
+    if auth.get("conflicts"):
+        field("Conflicting mechanisms", ", ".join(auth["conflicts"]))
+
+    heading("URLs and attachments")
+    urls = p.get("urls") or []
+    if urls:
+        for url in urls:
+            write_lines(f"URL: {url}", 8, "Courier", 4)
+    else:
+        write_lines("URL: none extracted", 8, "Courier", 4)
+    attachments = p.get("attachments") or []
+    if attachments:
+        for attachment in attachments:
+            field(
+                "Attachment",
+                f"{attachment.get('filename')} | {attachment.get('content_type')} | "
+                f"{attachment.get('size')} bytes | risk={attachment.get('risk', 'low')} | "
+                f"SHA-256 {attachment.get('sha256')}",
+            )
+    else:
+        write_lines("Attachment: none; metadata-only handling, never executed", 8, "Courier", 4)
+
+    heading("Detection and origin")
+    field("Method", f.get("method"))
+    field("Forensic score", f.get("forensic_score"))
+    field("NLP label/points", f"{(f.get('nlp') or {}).get('label')} / {(f.get('nlp') or {}).get('points')}")
+    field("Model status", (f.get("model") or {}).get("status"))
+    field("Probability", f.get("probability"))
+    assist = f.get("llm_assist") or {}
+    heading("Qwen analyst assist")
+    field("Assist status", assist.get("status"))
+    field("Assist provider", assist.get("provider"))
+    field("Assist model", assist.get("model"))
+    field("Assist validated", "yes" if assist.get("validated") else "no")
+    if assist.get("threat_types"):
+        field("Assist threat types", ", ".join(str(item) for item in assist["threat_types"]))
+    for item in assist.get("observations") or []:
+        write_lines(f"Observation: {item}", 8, "Times-Roman", 4)
+    for item in assist.get("recommended_actions") or []:
+        write_lines(f"Recommended action: {item}", 8, "Times-Roman", 4)
+    if assist.get("analyst_note"):
+        write_lines(f"Analyst note: {assist['analyst_note']}", 8, "Times-Roman", 4)
+    write_lines(assist.get("note") or "No Qwen analyst assist was requested.", 8, "Times-Italic", 4)
+    for signal in f.get("signals") or []:
+        write_lines(
+            f"Signal +{signal.get('points', 0)} [{signal.get('code')}] "
+            f"{signal.get('reason')} (source: {signal.get('source')})",
+            8,
+            "Times-Roman",
+            4,
+        )
+    if not f.get("signals"):
+        write_lines("No positive detection signals.", 8, "Times-Roman", 4)
+    origin = p.get("origin") or {}
+    field("Probable earliest observed public hop", f"{origin.get('ip')} | {origin.get('city')} | {origin.get('isp')} | {origin.get('kind')} | {origin.get('source')}")
+    field("Origin interpretation", "hosting/infrastructure context; not a person's GPS or identity")
+    for hop in (p.get("hops") or [])[:12]:
+        write_lines(
+            f"Hop {hop.get('index')}: {hop.get('ip') or '-'} | {hop.get('city')} | {hop.get('isp')} | {hop.get('source')} | {hop.get('raw')}",
+            8,
+            "Courier",
+            4,
+        )
+
+    heading("Campaign candidate")
+    graph = case.get("graph") or {}
+    write_lines(graph.get("note") or "Shared indicators are not identity proof.", 8, "Times-Italic", 4)
+    edges = graph.get("edges") or []
     if not edges:
-        c.drawString(18 * mm, y, "None yet. Analyse a second related .eml.")
-        y -= 4 * mm
-    for e in edges[:8]:
-        c.drawString(18 * mm, y, f"{e.get('from')} -- {e.get('to')}  {e.get('caption') or ', '.join(e.get('shared') or [])}"[:100])
-        y -= 4 * mm
-    y -= 6 * mm
-    c.setFont("Times-Bold", 11)
-    c.drawString(18 * mm, y, "SHA-256 of this exact .eml")
-    y -= 6 * mm
-    c.setFont("Courier", 8)
-    c.drawString(18 * mm, y, p.get("sha256", ""))
-    y -= 10 * mm
-    c.setFont("Times-Italic", 9)
-    c.drawString(18 * mm, y, "Geo is hosting city / ISP. Not a person's GPS. No live mailbox.")
+        write_lines("No focused relationship yet. Analyse a second related .eml.", 8, "Times-Roman", 4)
+    for edge in edges[:8]:
+        field(
+            "Relationship",
+            f"{edge.get('from')} -- {edge.get('to')} | {edge.get('caption')} | "
+            f"strength={edge.get('strength')} | shared={', '.join(edge.get('shared') or [])}",
+        )
+
+    heading("Provenance and uncertainty")
+    provenance = p.get("provenance") or {}
+    for key, value in provenance.items():
+        field(f"Provenance {key}", value)
+    for item in f.get("uncertainty") or p.get("uncertainty") or []:
+        write_lines(f"Uncertainty: {item}", 8, "Times-Roman", 4)
+    retention = evidence.get("retention") or {}
+    field("Retention", retention.get("policy") or "not configured")
+    for event in evidence.get("custody_events") or []:
+        field("Custody event", f"{event.get('action')} | {event.get('actor')} | {event.get('at')}")
+    write_lines(
+        "SHA-256 is an integrity fingerprint. This local prototype trace is not legal-grade chain of custody, "
+        "a public blockchain, or human attribution. Live DNS reads published SPF/DMARC TXT records; it does not verify DKIM signatures.",
+        8,
+        "Times-Italic",
+        4,
+    )
     c.showPage()
     c.save()
     return path
