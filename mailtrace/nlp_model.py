@@ -82,7 +82,7 @@ def analyze(subject: str, body: str) -> dict[str, Any]:
         "confidence": 0.0,
         "points": 0,
         "source": "local-nlp",
-        "note": "Bounded NLP component. Not a calibrated probability. Not Qwen.",
+        "note": "Local wording check. Can add a few points to the score.",
     }
     if not text:
         base["status"] = "empty"

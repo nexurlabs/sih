@@ -111,10 +111,9 @@ def build():
         P("Complete teammate guide — what we built, every term, and the screenshots that prove it.", "CoverSub"),
         P("This PDF is the whole story in one file. You do not need GitHub to walk someone through it. The live lab is a local-first analyst tool: upload a saved <b>.eml</b>, get a score, reasons, hop map, campaign graph, hashed evidence, and a case PDF."),
         P("It is not Gmail. It does not read inboxes. It does not send phishing. Geo is hosting city / ISP of a mail server, not a person's GPS."),
-        P("Screenshots in this PDF were recaptured from the live v0.3.0 lab on 3 Sep 2026 — including Local NLP, live SPF/DMARC TXT, and GeoIP. They are not old mockups.", "Note"),
         Spacer(1, 4 * mm),
         *shot("01_landing.png", 95 * mm),
-        P("Figure 1 — Landing page (latest). Sample chips + .eml upload. Dossier look, not a SOC dashboard.", "Cap"),
+        P("Figure 1 — Landing page. Sample chips + .eml upload.", "Cap"),
     ]
 
     story += [
@@ -132,8 +131,7 @@ def build():
     story.append(PageBreak())
     story += [
         P("4. Run it on your own PC (from GitHub)", "H2"),
-        P("The repo is <b>private</b>: https://github.com/nexurlabs/sih — if GitHub says “not found”, you were not invited yet. Ask Rishabh. Do not make the repo public."),
-        P("This is the noob path for Windows. Mac/Linux notes at the end of this section. You do not need the IBM VM. You do not need Gmail."),
+        P("The code is on GitHub: <b>https://github.com/nexurlabs/sih</b> (public). Clone it, then follow the Windows steps below. Mac/Linux notes are at the end of this section. You do not need the IBM VM. You do not need Gmail."),
         P("Step A — install three things (once)", "H2"),
         P("1. <b>Python 3.11 or 3.12</b> from python.org → Downloads → Windows. On the installer, tick <b>Add python.exe to PATH</b>. Finish, then close PowerShell if it was open and open a new one.<br/>2. <b>Git</b> from git-scm.com (Next, Next, Next is fine). Or install GitHub Desktop if you hate terminals.<br/>3. Confirm Python works:"),
         Preformatted("python --version\n# expect: Python 3.11.x or 3.12.x", S["Cmd"]),
@@ -170,17 +168,17 @@ def build():
         P("5. How to use it (30 seconds, once it is open)", "H2"),
         P("Open the app → click <b>04_spf_fail.eml</b> → you should see <b>64 / SPOOF</b>. Then click <b>07_cloud_hops.eml</b> and <b>08_campaign_twin.eml</b> → the graph shows two nodes and one edge. Download the case PDF. On the private host you can also drop a real saved .eml."),
         *shot("02_case_spf_fail.png", 125 * mm),
-        P("Figure 2 — Latest dossier for 04 (3 Sep 2026). 64 SPOOF, NLP in the score path, Qwen sidebar, Frankfurt hop, Live DNS, evidence. This is the main demo click.", "Cap"),
+        P("Figure 2 — Case 04. Stamp 64 SPOOF, reasons, hop list, Frankfurt origin map, wording check, live DNS, evidence.", "Cap"),
     ]
 
     story.append(PageBreak())
     story += [
-        P("6. Screenshot proofs (latest UI, not old mockups)", "H2"),
-        P("Recaptured from the live v0.3.0 lab on 3 Sep 2026. Local NLP, live SPF/DMARC TXT, and GeoIP are in these shots."),
+        P("6. What the app looks like", "H2"),
+        P("Same screens you get after you start the app and click a sample."),
         *shot("case_header.png", 55 * mm),
         P("Figure 3 — Case header: 64 SPOOF, SPF/DKIM/DMARC fail pills.", "Cap"),
         *shot("case_nlp.png", 42 * mm),
-        P("Figure 4 — Local NLP (tfidf-logreg). Bounded points inside the score. Not Qwen. Not a probability.", "Cap"),
+        P("Figure 4 — Local wording check. Reads the email text and can add a few points to the score.", "Cap"),
         *shot("case_live_dns.png", 42 * mm),
         P("Figure 5 — Live DNS. pec.edu.in has no published SPF/DMARC TXT (absent). That is a real finding, not a lookup bug.", "Cap"),
         *shot("case_auth_source.png", 32 * mm),
@@ -226,7 +224,7 @@ def build():
         ("Spoof", "Fake sender identity. The envelope lies."),
         ("Score 0–100", "Risk meter. Starts at 8, adds points per signal. 64 is not “64% sure.”"),
         ("Forensic score", "The rule-based part only (SPF, Reply-To, keywords, cloud hop…)."),
-        ("NLP", "Local TF-IDF + logistic regression on wording. Adds a few bounded points. Not Qwen. Not a probability."),
+        ("NLP", "Local wording model (TF-IDF + logistic regression). Reads the email text and can add a few points to the score. Different tool from the optional Qwen notes."),
         ("Qwen / Groq", "Optional LLM notes. Redacted input. Never changes the stamp."),
         ("Label", "CLEAN &lt; 45. SPOOF from header/auth. BEC if payment language. PHISH if password/lookalike + high score."),
         ("Signal", "One finding with points and a source, e.g. spf_fail +22 from message-header."),

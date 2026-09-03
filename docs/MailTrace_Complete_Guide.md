@@ -1,12 +1,10 @@
-# MailTrace — Complete Noob-Friendly Guide (SIH26106)
+# MailTrace — Complete Guide (SIH26106)
 
-> If you know nothing about email security, start here. What we built, every term, screenshot proofs from the **latest** UI (NLP + live DNS + GeoIP), and **how to run it on your own Windows PC from GitHub**.
+What we built, every term, how to run it on your own PC, and screenshots of the app.
 
-**Repo (private):** https://github.com/nexurlabs/sih  
-**Live full build (private):** https://nexurlabs.com/mailtrace-private/  
+**Repo:** https://github.com/nexurlabs/sih  
+**Hosted lab (login):** https://nexurlabs.com/mailtrace-private/  
 **Local:** http://127.0.0.1:8777 after you start uvicorn (see section 4)
-
-Screenshots in `docs/shots/explainer/` were recaptured from live v0.3.0 on **3 Sep 2026**.
 
 ---
 
@@ -57,14 +55,13 @@ So we built an **explainable, laptop-first analyst lab**. Zero Gmail access requ
 
 ## 4. Run it on your own Windows PC (from GitHub)
 
-You do **not** need the IBM VM. You clone the private repo and run it locally.
+You do **not** need the IBM VM. Clone the GitHub repo and run it locally.
 
 ### A. One-time installs
 
-1. Get **invited** to https://github.com/nexurlabs/sih (it is **private**). If GitHub says "not found", you were not invited.
-2. Install **Python 3.11 or 3.12** from https://www.python.org/downloads/windows/  
+1. Install **Python 3.11 or 3.12** from https://www.python.org/downloads/windows/  
    On the installer, tick **Add python.exe to PATH**. Then close any old terminals and open a new PowerShell.
-3. Install **Git** from https://git-scm.com/download/win (Next, Next, Next). Or use GitHub Desktop.
+2. Install **Git** from https://git-scm.com/download/win (Next, Next, Next). Or use GitHub Desktop.
 
 Check Python:
 
@@ -75,6 +72,8 @@ python --version
 If that says "not recognized", PATH was not ticked. Reinstall Python and tick the box.
 
 ### B. Clone
+
+The repo is public: https://github.com/nexurlabs/sih
 
 ```powershell
 cd $HOME\Desktop
@@ -165,11 +164,10 @@ python3 -m uvicorn app:app --host 127.0.0.1 --port 8777
 - Send phishing
 - Claim you located a person
 - Commit `.env`, Groq keys, or `.mmdb`
-- Make this repo public
 
 ---
 
-## 5. Screenshot proofs (latest UI)
+## 5. What the app looks like
 
 Landing + sample list:
 
@@ -179,7 +177,7 @@ SPF-fail case (full dossier: NLP, Qwen, Frankfurt map, live DNS, evidence):
 
 ![spf fail case](shots/explainer/02_case_spf_fail.png)
 
-Local NLP in the score path:
+Local wording check:
 
 ![nlp](shots/explainer/case_nlp.png)
 
@@ -259,7 +257,7 @@ All 8 fixtures:
 - **Phish** — steal a password. Verify / login / suspended.
 - **Spoof** — fake sender identity.
 - **Score 0-100** — risk meter. Starts at 8, adds points. 64 is not "64% sure".
-- **NLP** — local wording model. Adds a few bounded points. Not Qwen.
+- **NLP** — local wording model. Reads the email text and can add a few points to the score.
 - **Qwen / Groq** — optional notes. Never changes the stamp.
 - **GeoIP** — IP → city/ISP of a **mail server**. Not GPS of a person.
 - **Campaign graph** — dots = emails, line = shared Reply-To / domain / hop. Not "same person".

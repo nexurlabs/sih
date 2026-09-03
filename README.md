@@ -1,6 +1,6 @@
 # MailTrace (SIH26106)
 
-Private team repo. Local analyst lab.
+Local analyst lab.
 
 Upload a saved `.eml` → score + reasons + hop map + campaign graph + SHA-256 PDF.
 
@@ -33,7 +33,7 @@ The installer configures `qwen/qwen3.8-27b` for MailTrace and all three SIH Bot 
 
 ## Run on Windows (teammates / noobs)
 
-Repo is **private**. Get invited first. If GitHub says not found, you were not invited.
+Repo is public: https://github.com/nexurlabs/sih
 
 1. Install Python 3.11+ from python.org and tick **Add python.exe to PATH**.
 2. Install Git (or GitHub Desktop).
@@ -103,4 +103,3 @@ verified against the portal and the six-page export is visually reviewed.
 - Send phishing
 - Claim you located a person
 - Put mail on a public chain
-- Make this repo public
