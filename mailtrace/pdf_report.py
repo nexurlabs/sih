@@ -1,4 +1,4 @@
-"""One-page forensic PDF. Hash of the .eml, not a blockchain."""
+"""Forensic PDF report. Hash of the .eml, not a blockchain."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -33,13 +33,18 @@ def write_pdf(case: dict[str, Any]) -> Path:
         nonlocal y
         text = str(value if value is not None else "") or "-"
         lines = textwrap.wrap(text, width=105, break_long_words=True, break_on_hyphens=False) or [""]
-        needed = len(lines) * gap
+        # ReportLab's drawString uses the baseline as the y coordinate. The old
+        # 4.2/4.5pt gaps were smaller than the 8/9pt glyphs, so every field
+        # visibly collided with the next one. Preserve callers' requested gap
+        # as a lower bound, but enforce readable leading for the font size.
+        leading = max(float(gap), size * 1.2)
+        needed = len(lines) * leading
         if y - needed < bottom:
             new_page()
         c.setFont(font, size)
         for line in lines:
             c.drawString(left, y, line)
-            y -= gap
+            y -= leading
 
     def heading(value: str) -> None:
         nonlocal y
