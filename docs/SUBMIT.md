@@ -26,7 +26,7 @@ SIH does **not** want a public website for the idea round.
 ## Gate 3 — finale if selected
 
 - Working prototype on a **laptop** (localhost is enough)
-- Code: private `github.com/nexurlabs/sih`
+- Code: `github.com/nexurlabs/sih` (public)
 - Do not buy a domain or host MailTrace publicly for the idea round
 
 ## Not submission
@@ -34,4 +34,3 @@ SIH does **not** want a public website for the idea round.
 - Gmail ingest
 - Live phishing
 - “We found the hacker”
-- Making this repo public unless SPOC asks

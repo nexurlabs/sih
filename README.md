@@ -27,11 +27,11 @@ python3 scripts/set_groq_key.py
 ./run.sh
 ```
 
-The installer configures `qwen/qwen3.8-27b` for MailTrace and all three SIH Bot Mode profiles. The app sends Groq a redacted evidence summary only: no raw `.eml`, attachment bytes, query strings, or unmasked email addresses. Qwen classifies wording for bounded NLP points and also writes sidebar notes. Marked non-validated; not a probability. Without the key or with the feature disabled, the app remains fully usable offline.
+The installer configures `qwen/qwen3.8-27b` for MailTrace and all three SIH Bot Mode profiles. The app sends Groq a redacted evidence summary only: no raw `.eml`, attachment bytes, query strings, or unmasked email addresses. Qwen classifies wording for bounded NLP points and writes sidebar notes. Not a probability. Without a key the app still runs (sklearn fallback).
 
 **Demo:** `04_spf_fail.eml`, then `07_cloud_hops.eml` + `08_campaign_twin.eml` (graph). Download PDF on the case.
 
-## Run on Windows (teammates / noobs)
+## Run on Windows
 
 Repo is public: https://github.com/nexurlabs/sih
 

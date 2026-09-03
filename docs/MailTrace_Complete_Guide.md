@@ -10,7 +10,7 @@ What we built, every term, how to run it on your own PC, and screenshots of the 
 
 ## 1. What is MailTrace in one minute?
 
-MailTrace is a **detective table for suspicious emails**.
+MailTrace is a **laptop lab for saved emails**.
 
 You give it a saved email file (`.eml`). It tells you:
 
@@ -22,7 +22,7 @@ You give it a saved email file (`.eml`). It tells you:
 
 It is **not** Gmail. It does not read your inbox. It does not send phishing. It does not track humans.
 
-Think: **post-mortem lab, not spam filter.**
+Think: **analyst lab, not spam filter.**
 
 ---
 
@@ -36,7 +36,7 @@ Real pain:
 
 - A student gets "Exam Cell <notice@pec.edu.in>" but it actually came from `rogue.example`. Fees / passwords get stolen.
 - A "vendor" sends "new bank account, wire urgently" — that's BEC.
-- Normal spam filters just say "spam / not spam". They don't show **why**, **where it came from**, or **whether 5 other mails are the same gang**.
+- Normal spam filters just say "spam / not spam". They don't show **why**, **where it came from**, or **whether other mails share the same clues**.
 
 So we built an **explainable, laptop-first analyst lab**. Zero Gmail access required.
 
@@ -115,7 +115,7 @@ Or, after Activate: `.\run.ps1`
 
 Stop later with **Ctrl+C**.
 
-If NLP artifacts are missing:
+NLP uses Groq Qwen (see below). If you have **no Groq key**, sklearn fallback needs:
 
 ```powershell
 python scripts\train_nlp.py
@@ -183,7 +183,7 @@ SPF-fail case (full dossier: NLP, Qwen, Frankfurt map, live DNS, evidence):
 
 ![spf fail case](shots/explainer/02_case_spf_fail.png)
 
-Local wording check:
+NLP (Qwen 3.8 27B via Groq):
 
 ![nlp](shots/explainer/case_nlp.png)
 
@@ -199,7 +199,7 @@ Graph close-up:
 
 ![graph focus](shots/explainer/graph_focus.png)
 
-Qwen notes (same Groq model; wording class already fed the stamp):
+Qwen notes (same Groq model):
 
 ![assist](shots/explainer/case_assist.png)
 
@@ -230,7 +230,7 @@ All 8 fixtures:
 
 | Piece | What | Why |
 |---|---|---|
-| Language | **Python 3.11+** | email + tests + sklearn |
+| Language | **Python 3.11+** | email parsing, tests, Groq client |
 | API | **FastAPI** (`app.py`) | `/api/analyze`, health, PDF |
 | Parser | stdlib `email` + `mailtrace/parse.py` | headers, body, URLs, attachment metadata |
 | Score | `mailtrace/score.py` | explainable; same file → same forensic score |
@@ -247,7 +247,7 @@ All 8 fixtures:
 
 ---
 
-## 7. Terms explained like you're 10
+## 7. Terms
 
 - **`.eml`** — a saved email file. Gmail: Show original → Download.
 - **From / To / Subject** — who claims to send, who receives, title. Easy to fake.
@@ -278,10 +278,8 @@ All 8 fixtures:
  → parse_eml
  → offline WHOIS cache
  → live SPF/DMARC TXT (optional)
- → fuse (base 8 + SPF 22 + DKIM 12 + DMARC 12 + cloud … = 64)
- → label SPOOF
- → Qwen NLP wording class (or sklearn fallback)
- → fuse (rules + bounded NLP points)
+ → Qwen NLP on subject/body (sklearn if no Groq key)
+ → fuse: header rules + bounded NLP points → 64 SPOOF on this file
  → SQLite + SHA-256
  → NetworkX graph
  → PDF on demand

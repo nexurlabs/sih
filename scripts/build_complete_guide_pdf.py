@@ -108,8 +108,8 @@ def build():
     story += [
         P("SIH26106  ·  EMAIL THREAT  ·  GEO  ·  FORENSICS", "Kicker"),
         P("MailTrace", "H1"),
-        P("Complete teammate guide — what we built, every term, and the screenshots that prove it.", "CoverSub"),
-        P("This PDF is the whole story in one file. You do not need GitHub to walk someone through it. The live lab is a local-first analyst tool: upload a saved <b>.eml</b>, get a score, reasons, hop map, campaign graph, hashed evidence, and a case PDF."),
+        P("Complete guide — what we built, every term, how to run it, and screenshots of the app.", "CoverSub"),
+        P("Upload a saved <b>.eml</b>. You get a score, reasons, hop map, campaign graph, hashed evidence, and a case PDF. GitHub: https://github.com/nexurlabs/sih"),
         P("It is not Gmail. It does not read inboxes. It does not send phishing. Geo is hosting city / ISP of a mail server, not a person's GPS."),
         Spacer(1, 4 * mm),
         *shot("01_landing.png", 95 * mm),
@@ -120,7 +120,7 @@ def build():
         P("1. What it is, in one minute", "H2"),
         P("Give MailTrace a saved email. It answers five questions:"),
         P("1. Is it shady? Score 0–100 and a label: CLEAN, SPOOF, PHISH, or BEC.<br/>2. Why? Plain reasons such as SPF fail or Reply-To ≠ From.<br/>3. Where did it travel? The Received hop chain and the probable first public hop.<br/>4. Is it part of a campaign? A graph linking emails that share Reply-To / domain / hop.<br/>5. Proof? SHA-256 of the exact uploaded bytes + a downloadable PDF case file."),
-        P("Think: post-mortem lab, not a spam filter.", "Note"),
+        P("Laptop analyst lab, not a spam filter.", "Note"),
         P("2. Why this exists", "H2"),
         P("SIH26106 asks for an AI-powered platform that detects fraudulent email and helps an investigator explain origin and campaign links. Real pain: a mail that looks like Exam Cell but came from a rogue host; a vendor asking to wire money to a new account (BEC); spam filters that only say spam/not-spam."),
         P("So we built an explainable laptop lab. No Gmail login required. Teammates can demo it from a saved file."),
@@ -133,7 +133,7 @@ def build():
         P("4. Run it on your own PC (from GitHub)", "H2"),
         P("The code is on GitHub: <b>https://github.com/nexurlabs/sih</b> (public). Clone it, then follow the Windows steps below. Mac/Linux notes are at the end of this section. You do not need the IBM VM. You do not need Gmail."),
         P("Step A — install three things (once)", "H2"),
-        P("1. <b>Python 3.11 or 3.12</b> from python.org → Downloads → Windows. On the installer, tick <b>Add python.exe to PATH</b>. Finish, then close PowerShell if it was open and open a new one.<br/>2. <b>Git</b> from git-scm.com (Next, Next, Next is fine). Or install GitHub Desktop if you hate terminals.<br/>3. Confirm Python works:"),
+        P("1. <b>Python 3.11 or 3.12</b> from python.org → Downloads → Windows. On the installer, tick <b>Add python.exe to PATH</b>. Finish, then close PowerShell if it was open and open a new one.<br/>2. <b>Git</b> from git-scm.com, or GitHub Desktop.<br/>3. Confirm Python works:"),
         Preformatted("python --version\n# expect: Python 3.11.x or 3.12.x", S["Cmd"]),
         P("If that says “not recognized”, PATH was not ticked. Reinstall Python and tick the box."),
         P("Step B — clone the repo", "H2"),
@@ -141,13 +141,13 @@ def build():
         Preformatted("cd $HOME\\Desktop\ngit clone https://github.com/nexurlabs/sih.git\ncd sih", S["Cmd"]),
         P("GitHub Desktop: File → Clone repository → nexurlabs/sih → clone to Desktop, then open that folder in a terminal."),
         P("Step C — make a venv (do not skip)", "H2"),
-        P("A venv is a private Python just for this project, so you do not wreck other stuff."),
+        P("A venv is a separate Python install for this project only."),
         Preformatted("python -m venv .venv\n.\\.venv\\Scripts\\Activate.ps1", S["Cmd"]),
-        P("If PowerShell screams about execution policy, run this once, then Activate again:"),
+        P("If PowerShell blocks scripts, run this once, then Activate again:"),
         Preformatted("Set-ExecutionPolicy -Scope CurrentUser RemoteSigned", S["Cmd"]),
         P("CMD instead of PowerShell: run <font face='Courier'>.venv\\Scripts\\activate.bat</font>. You should see <b>(.venv)</b> at the left of the prompt."),
         P("Step D — install, test, start", "H2"),
-        Preformatted("pip install -r requirements.txt\npython scripts\\write_samples.py\npython scripts\\train_nlp.py\npytest -q\npython -m uvicorn app:app --host 127.0.0.1 --port 8777", S["Cmd"]),
+        Preformatted("pip install -r requirements.txt\npython scripts\\write_samples.py\npytest -q\npython -m uvicorn app:app --host 127.0.0.1 --port 8777", S["Cmd"]),
         P("Leave that window open. Open Chrome/Edge and go to <b>http://127.0.0.1:8777</b> — that is your copy, on your laptop. Stop it later with Ctrl+C in the same window. After Activate you can also run <font face='Courier'>.\\run.ps1</font>."),
         P("If <font face='Courier'>python</font> opens the Microsoft Store instead of Python, use <font face='Courier'>py -3</font> in every command (py -3 -m venv .venv, py -3 -m uvicorn …).", "Note"),
         P("Step E — click the demo (this is how you use it)", "H2"),
@@ -169,9 +169,9 @@ def build():
 
     story += [
         P("5. How to use it (30 seconds, once it is open)", "H2"),
-        P("Open the app → click <b>04_spf_fail.eml</b> → you should see <b>64 / SPOOF</b>. Then click <b>07_cloud_hops.eml</b> and <b>08_campaign_twin.eml</b> → the graph shows two nodes and one edge. Download the case PDF. On the private host you can also drop a real saved .eml."),
+        P("Open the app → click <b>04_spf_fail.eml</b> → you should see <b>64 / SPOOF</b>. Then click <b>07_cloud_hops.eml</b> and <b>08_campaign_twin.eml</b> → the graph shows two nodes and one edge. Download the case PDF. The hosted lab (login) also allows a real saved .eml."),
         *shot("02_case_spf_fail.png", 125 * mm),
-        P("Figure 2 — Case 04. Stamp 64 SPOOF, reasons, hop list, Frankfurt origin map, wording check, live DNS, evidence.", "Cap"),
+        P("Figure 2 — Case 04. Stamp 64 SPOOF, reasons, hop list, Frankfurt origin map, NLP, live DNS, evidence.", "Cap"),
     ]
 
     story.append(PageBreak())
@@ -187,7 +187,7 @@ def build():
         *shot("case_auth_source.png", 32 * mm),
         P("Figure 6 — Auth source vs live DNS. Header-stated = what the .eml already said. Independent DKIM crypto = no.", "Cap"),
         *shot("case_assist.png", 80 * mm),
-        P("Figure 7 — Qwen notes (same Groq model). Wording class already went into the stamp as bounded NLP points.", "Cap"),
+        P("Figure 7 — Qwen notes from the same Groq model after the wording class is scored.", "Cap"),
     ]
 
     story.append(PageBreak())
@@ -206,7 +206,7 @@ def build():
 
     story.append(PageBreak())
     story += [
-        P("7. Every term, in plain language", "H2"),
+        P("7. Terms", "H2"),
     ]
     terms = [
         (".eml", "A saved email file. Full headers + body. Gmail: Show original → Download."),
@@ -278,7 +278,7 @@ def build():
     ]
     stack = [
         ["piece", "what", "why"],
-        ["Language", "Python 3", "Email + tests + ML libs"],
+        ["Language", "Python 3", "Email + tests + Groq client"],
         ["API", "FastAPI + Uvicorn", "Tiny /api/analyze, health, PDF"],
         ["Parser", "stdlib email + parse.py", "MIME, hops, HTML hrefs"],
         ["Score", "score.py rules", "Explainable; same file → same forensic score"],

@@ -10,7 +10,7 @@ Do not present the current prototype as a Gmail/mail gateway, real-time or pre-i
 
 ## B. Requirements-to-proof summary
 
-- Detection: partial. `mailtrace/score.py` uses deterministic keyword/header rules and currently labels the eight synthetic fixtures CLEAN/SPOOF/PHISH/BEC. Gap: no evaluated ML/NLP, robust HTML/obfuscation analysis, URL reputation, or calibrated probability.
+- Detection: partial. `mailtrace/score.py` uses deterministic keyword/header rules and currently labels the eight synthetic fixtures CLEAN/SPOOF/PHISH/BEC. NLP is Groq Qwen 3.8 27B (bounded points, sklearn fallback). Still no calibrated probability, URL reputation, or obfuscation analysis.
 - Header forensics: partial. `mailtrace/parse.py` extracts From, Return-Path, Received, Message-ID, Reply-To, and header-stated SPF/DKIM/DMARC. Gap: Return-Path, Message-ID, raw auth evidence, alignment/verification mode, URLs, and attachment metadata need dossier/PDF parity. Never call header-stated results live verification.
 - Origin intelligence: offline approximation. Known demo IPs and a hand-built domain cache provide hosting context. Gap: no live intelligence, IPv6, robust relay validation, or numeric origin confidence.
 - Correlation: partial. NetworkX links shared domains/IPs/Reply-To. Gap: common/shared demo IPs can create false campaigns; UI captions are hardcoded; no external TI or identity classification.

@@ -253,7 +253,7 @@ Parser extracts Return-Path, Message-ID, URLs, and attachments, but the live UI/
 - Phone-width render clips the fixed two-column layout and wraps the case title badly. Desktop/laptop demo render is clean.
 
 ### Parsing/intelligence
-- No trained NLP/ML model.
+- NLP is Groq Qwen 3.8 27B with bounded points; sklearn fallback; not a calibrated detector.
 - HTML-only body is not semantically analyzed.
 - IPv6 support is absent.
 - Auth extraction is substring/first-match oriented.

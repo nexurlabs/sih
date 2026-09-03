@@ -241,7 +241,7 @@
       return `
         <h2>NLP (in score path)</h2>
         <div class="assistBox advisory" data-nlp-status="${esc(n.status || "unknown")}">
-          <div class="assistStatus">${esc(n.status || "?")} · ${esc(n.model || "tfidf-logreg")} · ${esc(n.label || "clean")} · +${esc(n.points || 0)} pts</div>
+          <div class="assistStatus">${esc(n.status || "?")} · ${esc(n.model || "qwen/qwen3.8-27b")} · ${esc(n.label || "clean")} · +${esc(n.points || 0)} pts</div>
           <p class="small">${esc(n.note || "Groq Qwen 3.8 27B classifies wording. Points are bounded. Sklearn if Groq is off.")}</p>
         </div>`;
     }

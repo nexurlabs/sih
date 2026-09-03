@@ -10,4 +10,4 @@ MailTrace is a local-first analyst platform for SIH26106. An investigator upload
 
 The key difference from a spam/ham filter is the evidence trail: the analyst can see why a message is suspicious, where it likely travelled through, and whether another message shares the same Reply-To, domain or origin hop. The prototype runs on a laptop with local crafted `.eml` cases; it does not require Gmail access, send phishing, or claim the exact location of a human. Live DNS verification, larger GeoIP/ASN data, privacy controls and model calibration are the production hardening path.
 
-**Tech (one line):** FastAPI + Python MIME parser + SQLite + NetworkX + custom SVG graph + Leaflet fallback + ReportLab PDF; optional Groq `qwen/qwen3.8-27b` analyst assist is disabled by default, redaction-limited, advisory-only, and not a validated detector.
+**Tech (one line):** FastAPI + Python MIME parser + SQLite + NetworkX + custom SVG graph + Leaflet fallback + ReportLab PDF; NLP is Groq `qwen/qwen3.8-27b` (bounded wording points, sklearn fallback). Not a calibrated detector.
