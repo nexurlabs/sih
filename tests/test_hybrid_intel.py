@@ -70,11 +70,36 @@ def test_nlp_is_in_the_score_path_and_clean_stays_clean():
     parsed = parse_eml((root / "01_clean.eml").read_bytes(), "01_clean.eml")
     out = fuse(parsed)
     assert out["method"] == "hybrid-forensic-nlp"
-    assert out["model"]["status"] == "local-tfidf-logreg"
+    assert out["model"]["status"] == "tfidf-logreg"
     assert out["nlp"]["status"] in {"available", "empty"}
     assert out["label"] == "CLEAN"
     assert out["score"] < 45
     assert out["score"] == min(100, out["forensic_score"] + int(out["nlp"].get("points") or 0))
+
+
+def test_qwen_nlp_feeds_bounded_points(monkeypatch):
+    from mailtrace import llm_assist
+    from mailtrace.score import fuse
+
+    def fake_classify(_parsed):
+        return {
+            "status": "available",
+            "model": "qwen/qwen3.8-27b",
+            "source": "qwen-nlp",
+            "label": "credential_harvest",
+            "points": 18,
+            "validated": False,
+            "note": "NLP layer is Groq qwen/qwen3.8-27b.",
+        }
+
+    monkeypatch.setattr(llm_assist, "classify_wording", fake_classify)
+    root = Path(__file__).resolve().parents[1] / "samples"
+    parsed = parse_eml((root / "01_clean.eml").read_bytes(), "01_clean.eml")
+    out = fuse(parsed, allow_qwen=True)
+    assert out["nlp"]["source"] == "qwen-nlp"
+    assert out["nlp"]["points"] == 18
+    assert out["score"] == min(100, out["forensic_score"] + 18)
+    assert any(s.get("code") == "nlp_credential_harvest" for s in out["signals"])
 
 
 def test_04_forensic_score_stays_64():

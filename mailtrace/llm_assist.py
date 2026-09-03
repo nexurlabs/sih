@@ -1,8 +1,9 @@
-"""Optional Groq/Qwen analyst assistance for MailTrace.
+"""Groq/Qwen NLP for MailTrace.
 
-This module is deliberately advisory. The deterministic rule fusion remains the
-source of the displayed score and label. If Groq is not explicitly enabled or
-is unavailable, the case still completes locally with a truthful status.
+Qwen 3.8 27B on Groq is the NLP layer in the score path: it classifies
+subject/body wording and we map that class to bounded points. Forensic
+header rules still run locally. If Groq is off or fails, sklearn TF-IDF
+is the fallback. Sidebar notes come from the same Qwen call.
 """
 from __future__ import annotations
 
@@ -85,7 +86,7 @@ def status() -> dict[str, Any]:
         note = "Enablement is on, but GROQ_API_KEY is not available to the process."
     else:
         state = "ready"
-        note = "Redacted evidence may be sent to Groq for advisory analyst notes."
+        note = "Qwen 3.8 27B via Groq is the NLP layer (bounded wording points) plus sidebar notes."
     return {
         "status": state,
         "provider": "groq",
@@ -297,12 +298,97 @@ def _normalise(value: dict[str, Any], cfg: dict[str, Any]) -> dict[str, Any]:
         "recommended_actions": strings("recommended_actions", 4),
         "analyst_note": _redact_text(note, MAX_NOTE_CHARS),
         "needs_manual_review": manual,
-        "note": "Advisory Qwen output; not a validated classifier and not the deterministic score.",
+        "note": "Qwen 3.8 27B via Groq. Wording class feeds bounded NLP points; notes are extra.",
+    }
+
+
+def _chat_json(messages: list[dict[str, str]], cfg: dict[str, Any], max_tokens: int = 700) -> dict[str, Any]:
+    payload = {
+        "model": cfg["model"],
+        "messages": messages,
+        "temperature": 0,
+        "max_tokens": max_tokens,
+        "response_format": {"type": "json_object"},
+        "stream": False,
+    }
+    raw = _http_post(cfg["base_url"] + "/chat/completions", payload, cfg["api_key"], cfg["timeout"])
+    return _parse_json_content(_content_from_response(raw))
+
+
+NLP_LABELS = {
+    "clean",
+    "credential_harvest",
+    "payment_fraud",
+    "impersonation_urgency",
+}
+QWEN_NLP_POINTS = {
+    "clean": 0,
+    "impersonation_urgency": 12,
+    "payment_fraud": 16,
+    "credential_harvest": 18,
+}
+
+
+def classify_wording(parsed: dict[str, Any]) -> dict[str, Any] | None:
+    """Qwen NLP for the score path. None means caller should use sklearn."""
+    cfg = _config()
+    if not cfg["enabled"] or not cfg["configured"]:
+        return None
+    system = (
+        "You classify email SUBJECT and BODY wording for social engineering. "
+        "Ignore authentication, hops, and whether the sender looks fake — those are scored separately. "
+        "Return JSON only. Keys: nlp_label, nlp_rationale, threat_types, observations, "
+        "recommended_actions, analyst_note, needs_manual_review. "
+        "nlp_label must be exactly one of: clean, credential_harvest, payment_fraud, impersonation_urgency. "
+        "credential_harvest = password, login, verify-account, credential lures. "
+        "payment_fraud = wire, bank account change, invoice payment redirect. "
+        "impersonation_urgency = act-now / suspended / pressure language without those lures. "
+        "clean = no such lure language, even if the From line looks official. "
+        "Do not output a score or probability."
+    )
+    user = json.dumps(
+        {
+            "subject": _redact_text(parsed.get("subject"), 500),
+            "body": _redact_text(parsed.get("body"), MAX_BODY_CHARS),
+            "urls": [_safe_url(url) for url in (parsed.get("urls") or [])[:12]],
+        },
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+    try:
+        value = _chat_json(
+            [
+                {"role": "system", "content": system},
+                {"role": "user", "content": "<untrusted_email_text>\n" + user + "\n</untrusted_email_text>"},
+            ],
+            cfg,
+        )
+    except ProviderError:
+        return None
+    label = str(value.get("nlp_label") or "").strip().lower()
+    if label not in NLP_LABELS:
+        label = "clean"
+    rationale = value.get("nlp_rationale")
+    if not isinstance(rationale, str):
+        rationale = ""
+    assist = _normalise(value, cfg)
+    return {
+        "status": "available",
+        "provider": "groq",
+        "model": cfg["model"],
+        "validated": False,
+        "label": label,
+        "confidence": None,
+        "points": QWEN_NLP_POINTS[label],
+        "source": "qwen-nlp",
+        "rationale": _redact_text(rationale, 400),
+        "note": f"NLP layer is Groq {cfg['model']}. Points come from the wording class, not a probability.",
+        "assist": assist,
     }
 
 
 def analyze(parsed: dict[str, Any], fusion: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Run optional Qwen assistance, returning a safe status object on failure."""
+    """Run Qwen notes when NLP did not already call Groq."""
     cfg = _config()
     base = {
         "provider": "groq",
@@ -315,26 +401,17 @@ def analyze(parsed: dict[str, Any], fusion: dict[str, Any] | None = None) -> dic
         "needs_manual_review": True,
     }
     if not cfg["enabled"]:
-        return {**base, "status": "disabled", "note": "Enable MAILTRACE_LLM_ENABLED=1 to request advisory Qwen analysis."}
+        return {**base, "status": "disabled", "note": "Enable MAILTRACE_LLM_ENABLED=1 and set a Groq key for Qwen NLP."}
     if not cfg["configured"]:
-        return {**base, "status": "unconfigured", "note": "GROQ_API_KEY is not available; deterministic analysis was retained."}
-    payload = {
-        "model": cfg["model"],
-        "messages": _prompt(parsed, fusion),
-        "temperature": 0,
-        "max_tokens": 700,
-        "response_format": {"type": "json_object"},
-        "stream": False,
-    }
+        return {**base, "status": "unconfigured", "note": "GROQ_API_KEY is not available; sklearn NLP fallback is used."}
     try:
-        raw = _http_post(cfg["base_url"] + "/chat/completions", payload, cfg["api_key"], cfg["timeout"])
-        return _normalise(_parse_json_content(_content_from_response(raw)), cfg)
+        return _normalise(_chat_json(_prompt(parsed, fusion), cfg), cfg)
     except ProviderError as exc:
         return {
             **base,
             "status": "unavailable",
             "error_code": exc.code,
-            "note": "Qwen assistance was unavailable; deterministic analysis was retained.",
+            "note": "Qwen was unavailable; sklearn NLP fallback and forensic rules were retained.",
         }
 
 

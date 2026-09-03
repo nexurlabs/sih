@@ -20,14 +20,14 @@ uvicorn app:app --host 127.0.0.1 --port "$MAILTRACE_PORT"
 
 Open http://127.0.0.1:8777
 
-**Optional Qwen analyst assist (Groq):** the core score stays deterministic. Create a Groq free-tier key at https://console.groq.com/keys, then run the local installer. It prompts invisibly, writes the key only to git-ignored files, and never prints it:
+**NLP layer is Groq Qwen 3.8 27B.** Forensic header rules still run. Sklearn is fallback without a key. Create a Groq free-tier key at https://console.groq.com/keys, then run the local installer. It prompts invisibly, writes the key only to git-ignored files, and never prints it:
 
 ```bash
 python3 scripts/set_groq_key.py
 ./run.sh
 ```
 
-The installer configures `qwen/qwen3.8-27b` for MailTrace and all three SIH Bot Mode profiles. The app sends Groq a redacted evidence summary only: no raw `.eml`, attachment bytes, query strings, or unmasked email addresses. Qwen output appears as **analyst assist**, does not change the deterministic score/label, and is marked non-validated. Without the key or with the feature disabled, the app remains fully usable offline.
+The installer configures `qwen/qwen3.8-27b` for MailTrace and all three SIH Bot Mode profiles. The app sends Groq a redacted evidence summary only: no raw `.eml`, attachment bytes, query strings, or unmasked email addresses. Qwen classifies wording for bounded NLP points and also writes sidebar notes. Marked non-validated; not a probability. Without the key or with the feature disabled, the app remains fully usable offline.
 
 **Demo:** `04_spf_fail.eml`, then `07_cloud_hops.eml` + `08_campaign_twin.eml` (graph). Download PDF on the case.
 
@@ -94,7 +94,7 @@ verified against the portal and the six-page export is visually reviewed.
 - reportlab PDF
 - GeoIP via MaxMind MMDB + optional ip-api, demo IP pins preserved
 - Live SPF/DMARC TXT via dnspython when MAILTRACE_LIVE_DNS=1
-- Local TF-IDF/LogReg NLP as a bounded score component
+- NLP: Groq Qwen 3.8 27B (bounded wording points), sklearn TF-IDF fallback
 - Cached WHOIS json (no live scrape)
 
 ## Do not

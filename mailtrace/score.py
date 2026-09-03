@@ -8,7 +8,7 @@ from mailtrace.nlp_model import analyze as nlp_analyze
 BASE_SCORE = 8
 
 
-def fuse(parsed: dict[str, Any]) -> dict[str, Any]:
+def fuse(parsed: dict[str, Any], *, allow_qwen: bool = True) -> dict[str, Any]:
     reasons: list[str] = []
     signals: list[dict[str, Any]] = []
     score = BASE_SCORE
@@ -118,15 +118,20 @@ def fuse(parsed: dict[str, Any]) -> dict[str, Any]:
             "attachment-metadata",
         )
 
-    nlp = nlp_analyze(parsed.get("subject") or "", parsed.get("body") or "")
+    nlp = nlp_analyze(
+        parsed.get("subject") or "",
+        parsed.get("body") or "",
+        parsed,
+        allow_qwen=allow_qwen,
+    )
     forensic_score = max(0, min(100, score))
     nlp_points = int(nlp.get("points") or 0)
     if nlp_points:
         add_signal(
             f"nlp_{nlp.get('label')}",
             nlp_points,
-            f"Local NLP ({nlp.get('label')}) added a bounded {nlp_points} points. Not a probability.",
-            "local-nlp",
+            f"NLP ({nlp.get('model') or 'local'}: {nlp.get('label')}) added {nlp_points} bounded points.",
+            nlp.get("source") or "local-nlp",
         )
     score = max(0, min(100, score))
 
@@ -145,7 +150,7 @@ def fuse(parsed: dict[str, Any]) -> dict[str, Any]:
 
     uncertainty = [
         "Hybrid score is an explainable risk indicator, not a probability or accuracy percentage.",
-        "Forensic rules remain the primary detector. Local NLP adds bounded points only.",
+        "Forensic rules stay on. NLP is Groq Qwen 3.8 27B (bounded wording points) with sklearn fallback.",
         "Authentication results are stated in the .eml headers unless a live DNS TXT check is shown separately.",
         "Origin and campaign relationships describe observed infrastructure and shared indicators, not human identity.",
     ]
@@ -164,9 +169,11 @@ def fuse(parsed: dict[str, Any]) -> dict[str, Any]:
         "method": "hybrid-forensic-nlp",
         "probability": None,
         "model": {
-            "status": "local-tfidf-logreg",
+            "status": nlp.get("model") or "tfidf-logreg",
+            "source": nlp.get("source") or "local-nlp",
             "validated": False,
-            "note": "Local NLP is a bounded score component. Optional Groq Qwen output is advisory and does not change the score.",
+            "note": nlp.get("note")
+            or "NLP layer is Groq Qwen 3.8 27B when a key is set; sklearn is fallback.",
         },
         "uncertainty": uncertainty,
         "origin_note": "Geo is hosting/infrastructure context for the probable earliest observed public hop, not a person's GPS or identity.",

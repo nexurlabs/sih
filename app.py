@@ -54,9 +54,11 @@ def _assemble(
         parsed.get("return_domain"),
     )
     parsed["live_auth"] = live_check(parsed)
-    fusion = fuse(parsed)
+    fusion = fuse(parsed, allow_qwen=include_llm)
+    nlp = fusion.get("nlp") or {}
+    assist = nlp.pop("assist", None) if isinstance(nlp, dict) else None
     if include_llm:
-        fusion["llm_assist"] = build_assist(parsed, fusion)
+        fusion["llm_assist"] = assist if assist else build_assist(parsed, fusion)
     else:
         llm = llm_status()
         fusion["llm_assist"] = {

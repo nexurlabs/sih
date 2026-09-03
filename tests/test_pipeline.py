@@ -204,7 +204,7 @@ def test_fusion_exposes_structured_signals_and_no_fake_ml_claim():
     assert spf_signal["points"] == 22
     assert spf_signal["source"] == "message-header"
     assert out["method"] == "hybrid-forensic-nlp"
-    assert out["model"]["status"] == "local-tfidf-logreg"
+    assert out["model"]["status"] == "tfidf-logreg"
     assert out["model"]["validated"] is False
     assert out["probability"] is None
     assert any("not a probability" in item.lower() for item in out["uncertainty"])
@@ -716,7 +716,7 @@ def test_official_deck_source_keeps_claims_and_04_facts_honest():
     assert "Reply-To mismatch" not in source
     assert "Show uncertainty and raw evidence" in source
     assert "SPF/DKIM/DMARC fail  ·  header evidence  ·  earliest hop" in source
-    assert "Hybrid score: forensic header rules plus a bounded local NLP component; optional Groq Qwen3.8-27B output is redacted, advisory-only, disabled by default, and not a validated detector." in source
+    assert "Hybrid score: forensic header rules plus Groq Qwen 3.8 27B as the NLP layer (bounded wording points; sklearn fallback if Groq is off). Not a validated detector." in source
 
 
 def test_qwen_assist_is_disabled_without_explicit_opt_in(monkeypatch):
@@ -817,3 +817,41 @@ def test_public_demo_is_read_only_and_keeps_campaign_graph(tmp_path, monkeypatch
         assert len(case["graph"]["nodes"]) == 2
         assert len(case["graph"]["edges"]) == 1
         assert client.get("/api/cases").json() == []
+
+
+def test_pdf_body_lines_have_readable_leading(tmp_path, monkeypatch):
+    """PDF body lines must not overlap when rendered at their font size."""
+    from mailtrace import pdf_report
+
+    class CaptureCanvas:
+        last = None
+
+        def __init__(self, _path, pagesize=None):
+            self.pages = [[]]
+            self.font_size = 12
+            CaptureCanvas.last = self
+
+        def setFont(self, _font, size):
+            self.font_size = size
+
+        def drawString(self, _x, y, text):
+            self.pages[-1].append((y, self.font_size, text))
+
+        def showPage(self):
+            self.pages.append([])
+
+        def save(self):
+            pass
+
+    monkeypatch.setattr(pdf_report.canvas, "Canvas", CaptureCanvas)
+    root = Path(__file__).resolve().parents[1] / "samples"
+    parsed = parse_eml((root / "08_campaign_twin.eml").read_bytes(), "08_campaign_twin.eml")
+    case = {"id": "leading", "parsed": parsed, "fusion": fuse(parsed), "graph": {"edges": []}}
+
+    pdf_report.write_pdf(case)
+
+    for page in CaptureCanvas.last.pages:
+        for previous, current in zip(page, page[1:]):
+            previous_y, previous_size, _ = previous
+            current_y, _, _ = current
+            assert previous_y - current_y >= previous_size * 0.95

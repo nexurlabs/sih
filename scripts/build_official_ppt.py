@@ -355,7 +355,7 @@ def slide6(slide):
     add_label(slide, 0.55, 1.38, 'Problem + standards', BLUE, 2.6)
     add_panel(slide, 0.55, 1.68, 5.85, 2.65, PAPER, RULE)
     add_text(slide, 0.78, 1.92, 5.3, 0.20, 'SIH26106', 9, RUST, True, 'Arial', margin=0)
-    add_text(slide, 1.98, 1.92, 4.05, 0.68, 'Target scope: NLP/ML detection, header/origin forensics, domain intelligence, graph correlation and reporting. Hybrid score: forensic header rules plus a bounded local NLP component; optional Groq Qwen3.8-27B output is redacted, advisory-only, disabled by default, and not a validated detector.', 7.4, NAVY, margin=0)
+    add_text(slide, 1.98, 1.92, 4.05, 0.68, 'Target scope: NLP/ML detection, header/origin forensics, domain intelligence, graph correlation and reporting. Hybrid score: forensic header rules plus Groq Qwen 3.8 27B as the NLP layer (bounded wording points; sklearn fallback if Groq is off). Not a validated detector.', 7.4, NAVY, margin=0)
     add_text(slide, 0.78, 2.65, 5.3, 0.20, 'RFC 5322', 9, RUST, True, 'Arial', margin=0)
     add_text(slide, 1.98, 2.65, 4.05, 0.40, 'Internet Message Format: structured headers, message IDs and Received fields.', 8.5, NAVY, margin=0)
     add_text(slide, 0.78, 3.32, 5.3, 0.20, 'RFC 7208 / 6376 / 7489', 9, RUST, True, 'Arial', margin=0)

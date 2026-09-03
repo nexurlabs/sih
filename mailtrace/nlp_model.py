@@ -1,4 +1,4 @@
-"""Local TF-IDF logistic NLP. Bounded score component, not a calibrated detector."""
+"""NLP layer: Groq Qwen 3.8 27B when enabled, else local TF-IDF logistic."""
 from __future__ import annotations
 
 import json
@@ -22,13 +22,27 @@ _bundle: dict[str, Any] | None = None
 
 
 def status() -> dict[str, Any]:
+    from mailtrace.llm_assist import status as llm_status
+
+    llm = llm_status()
+    if llm.get("enabled") and llm.get("configured"):
+        return {
+            "status": "ready" if llm.get("status") == "ready" else llm.get("status"),
+            "model": llm.get("model") or "qwen/qwen3.8-27b",
+            "provider": "groq",
+            "fallback": "tfidf-logreg",
+            "validated": False,
+            "note": "NLP layer is Groq Qwen 3.8 27B. Sklearn TF-IDF is fallback if Groq is off or fails.",
+        }
+    sklearn_state = "available" if MODEL.is_file() or CORPUS.is_file() else "untrained"
     return {
-        "status": "available" if MODEL.is_file() or CORPUS.is_file() else "untrained",
+        "status": sklearn_state,
         "model": "tfidf-logreg",
+        "provider": "local",
         "validated": False,
         "corpus": str(CORPUS) if CORPUS.is_file() else None,
         "artifact": str(MODEL) if MODEL.is_file() else None,
-        "note": "Local wording check. Can add a few points to the score.",
+        "note": "Groq Qwen is off; using local sklearn wording model.",
     }
 
 
@@ -72,17 +86,25 @@ def train() -> dict[str, Any]:
     return {"n": len(texts), "labels": _bundle["labels"]}
 
 
-def analyze(subject: str, body: str) -> dict[str, Any]:
+def analyze(subject: str, body: str, parsed: dict[str, Any] | None = None, *, allow_qwen: bool = True) -> dict[str, Any]:
     text = f"{subject or ''}\n{body or ''}".strip()
+    payload = parsed or {"subject": subject, "body": body}
+    if allow_qwen:
+        from mailtrace.llm_assist import classify_wording
+
+        qwen = classify_wording(payload)
+        if qwen and qwen.get("status") == "available":
+            return qwen
     base = {
         "status": "available",
         "model": "tfidf-logreg",
+        "provider": "local",
         "validated": False,
         "label": "clean",
         "confidence": 0.0,
         "points": 0,
         "source": "local-nlp",
-        "note": "Local wording check. Can add a few points to the score.",
+        "note": "Groq Qwen unavailable; local sklearn wording model used.",
     }
     if not text:
         base["status"] = "empty"

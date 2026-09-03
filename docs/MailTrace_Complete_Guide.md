@@ -126,7 +126,7 @@ python scripts\train_nlp.py
 1. Click **04_spf_fail.eml** → **64 / SPOOF**. Point at SPF/DKIM/DMARC fail and Frankfurt (**hosting**, not a person).
 2. Click **01_clean.eml** → **8 / CLEAN**.
 3. Click **07_cloud_hops.eml** then **08_campaign_twin.eml** → two nodes, one edge.
-4. Scroll: **Local NLP**, **Live DNS**, origin map, evidence hash, **Download case PDF**.
+4. Scroll: **NLP (Qwen)**, **Live DNS**, origin map, evidence hash, **Download case PDF**.
 5. Optional: upload a real `.eml` (Gmail → ⋮ → Show original → Download).
 
 ### Optional: live DNS + GeoIP
@@ -141,13 +141,17 @@ python -m uvicorn app:app --host 127.0.0.1 --port 8777
 
 `.mmdb` files are **gitignored**. Demo IPs still pin Frankfurt. For random IPs, put `GeoLite2-City.mmdb` in `data/` (ask a teammate; do not commit).
 
-### Optional: Qwen notes (not the score)
+### NLP layer (Qwen 3.8 27B via Groq)
 
-The 0–100 stamp is header rules plus the **local wording check** (the NLP box). That model is in the repo and runs on the laptop. Qwen is a separate sidebar that writes notes. No Groq key → no Qwen box, **same score**. If you want the notes:
+The NLP that feeds the stamp is **Qwen 3.8 27B** on Groq (`qwen/qwen3.8-27b`). It reads subject + body and we map the class to bounded points: clean +0, urgency +12, payment +16, credential +18. Header rules still run. Sklearn TF-IDF is fallback if there is no key or Groq is down.
+
+Free key: https://console.groq.com/keys then:
 
 ```powershell
 python scripts\set_groq_key.py
 ```
+
+That writes `GROQ_API_KEY` to a git-ignored `.env` and sets `MAILTRACE_LLM_ENABLED=1`. Never commit the key.
 
 ### Mac / Linux / Git Bash
 
@@ -195,7 +199,7 @@ Graph close-up:
 
 ![graph focus](shots/explainer/graph_focus.png)
 
-Qwen advisory (never changes score):
+Qwen notes (same Groq model; wording class already fed the stamp):
 
 ![assist](shots/explainer/case_assist.png)
 
@@ -230,7 +234,8 @@ All 8 fixtures:
 | API | **FastAPI** (`app.py`) | `/api/analyze`, health, PDF |
 | Parser | stdlib `email` + `mailtrace/parse.py` | headers, body, URLs, attachment metadata |
 | Score | `mailtrace/score.py` | explainable; same file → same forensic score |
-| NLP | sklearn TF-IDF + LogReg | bounded wording points, local corpus |
+| NLP | **Groq Qwen 3.8 27B** | wording class → bounded score points |
+| Assist | Same Groq call | sidebar notes |
 | Graph | **NetworkX** | campaign candidates |
 | Store | **SQLite** + SHA-256 | laptop, no extra server |
 | PDF | **ReportLab** | case file download |
@@ -238,7 +243,6 @@ All 8 fixtures:
 | Map | Leaflet | tiles optional; hop list always works |
 | Geo | MaxMind MMDB | real IPs → city/ISP; demo IPs pinned |
 | Live DNS | dnspython | SPF/DMARC TXT when enabled |
-| Assist | Groq Qwen | sidebar only |
 | Tests | pytest | pins 04=64, 07+08 graph |
 
 ---
@@ -259,8 +263,8 @@ All 8 fixtures:
 - **Phish** — steal a password. Verify / login / suspended.
 - **Spoof** — fake sender identity.
 - **Score 0-100** — risk meter. Starts at 8, adds points. 64 is not "64% sure".
-- **NLP** — local wording model. Reads the email text and can add a few points to the score.
-- **Qwen / Groq** — optional notes. Never changes the stamp.
+- **NLP** — Groq Qwen 3.8 27B classifies subject/body. Bounded points: +0 / +12 / +16 / +18. Sklearn fallback if no Groq key.
+- **Qwen / Groq** — free key at console.groq.com. This is the NLP layer. Also writes sidebar notes. Not a probability.
 - **GeoIP** — IP → city/ISP of a **mail server**. Not GPS of a person.
 - **Campaign graph** — dots = emails, line = shared Reply-To / domain / hop. Not "same person".
 - **SHA-256** — fingerprint of the exact uploaded bytes.
@@ -276,8 +280,8 @@ All 8 fixtures:
  → live SPF/DMARC TXT (optional)
  → fuse (base 8 + SPF 22 + DKIM 12 + DMARC 12 + cloud … = 64)
  → label SPOOF
- → NLP bounded points
- → Qwen note (advisory)
+ → Qwen NLP wording class (or sklearn fallback)
+ → fuse (rules + bounded NLP points)
  → SQLite + SHA-256
  → NetworkX graph
  → PDF on demand
@@ -294,7 +298,7 @@ Why 64 not 100? No password lure, no invoice language, no lookalike. Honest: bad
 3. Open 01 → 8 CLEAN.
 4. 07 then 08 → two nodes, one edge. Campaign candidate.
 5. Evidence / PDF → hashed original bytes.
-6. Close: "Rules decide. NLP adds a bit. Qwen only explains. Geo is a server."
+6. Close: "Rules still score auth/hops. NLP is Qwen 3.8 27B via Groq, bounded points. Geo is a server."
 
 ---
 
