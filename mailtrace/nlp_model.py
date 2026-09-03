@@ -28,7 +28,7 @@ def status() -> dict[str, Any]:
         "validated": False,
         "corpus": str(CORPUS) if CORPUS.is_file() else None,
         "artifact": str(MODEL) if MODEL.is_file() else None,
-        "note": "Local NLP adds bounded points to the forensic score. It is not a probability and not Qwen.",
+        "note": "Local wording check. Can add a few points to the score.",
     }
 
 

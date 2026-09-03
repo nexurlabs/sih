@@ -129,7 +129,7 @@ python scripts\train_nlp.py
 4. Scroll: **Local NLP**, **Live DNS**, origin map, evidence hash, **Download case PDF**.
 5. Optional: upload a real `.eml` (Gmail → ⋮ → Show original → Download).
 
-### Optional: live DNS + GeoIP + Qwen
+### Optional: live DNS + GeoIP
 
 Windows does not auto-load `.env` unless you use Git Bash `./run.sh` or `.\run.ps1` after creating `.env`. Easiest in PowerShell **before** uvicorn:
 
@@ -141,7 +141,9 @@ python -m uvicorn app:app --host 127.0.0.1 --port 8777
 
 `.mmdb` files are **gitignored**. Demo IPs still pin Frankfurt. For random IPs, put `GeoLite2-City.mmdb` in `data/` (ask a teammate; do not commit).
 
-Qwen is optional. Score works without it:
+### Optional: Qwen notes (not the score)
+
+The 0–100 stamp is header rules plus the **local wording check** (the NLP box). That model is in the repo and runs on the laptop. Qwen is a separate sidebar that writes notes. No Groq key → no Qwen box, **same score**. If you want the notes:
 
 ```powershell
 python scripts\set_groq_key.py
