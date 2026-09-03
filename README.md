@@ -31,6 +31,43 @@ The installer configures `qwen/qwen3.8-27b` for MailTrace and all three SIH Bot 
 
 **Demo:** `04_spf_fail.eml`, then `07_cloud_hops.eml` + `08_campaign_twin.eml` (graph). Download PDF on the case.
 
+## Run on Windows (teammates / noobs)
+
+Repo is **private**. Get invited first. If GitHub says not found, you were not invited.
+
+1. Install Python 3.11+ from python.org and tick **Add python.exe to PATH**.
+2. Install Git (or GitHub Desktop).
+3. Clone, then in **PowerShell**:
+
+```powershell
+cd $HOME\Desktop
+git clone https://github.com/nexurlabs/sih.git
+cd sih
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python scripts\write_samples.py
+pytest -q
+python -m uvicorn app:app --host 127.0.0.1 --port 8777
+```
+
+If Activate is blocked: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+
+If `python` opens the Microsoft Store, use `py -3` instead of `python`.
+
+Leave that window open. Browser: http://127.0.0.1:8777
+
+**Clicks:** `04_spf_fail.eml` → 64 SPOOF. Then `07` + `08` → two nodes, one edge.
+
+Optional live DNS/Geo (this PowerShell window):
+
+```powershell
+$env:MAILTRACE_LIVE_DNS="1"
+$env:MAILTRACE_LIVE_GEO="1"
+```
+
+Or after Activate: `.\run.ps1` (reads `.env` if present). Full walkthrough: `docs/MailTrace_Complete_Guide.pdf`
+
 ## SIH submission deck
 
 The editable six-slide deck is built from the provided SIH 2026 template:

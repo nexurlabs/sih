@@ -102,7 +102,7 @@ Read every applicable PDF with the file reader/PDF extractor. These are local fi
   - Principal scope reference, but revalidate against the live official source links above.
   - Does not claim current implementation status.
 
-- `/root/sih-mailtrace/docs/MailTrace_Explanation.pdf`
+- `/root/sih-mailtrace/docs/MailTrace_Complete_Guide.pdf`
   - Product/testing guide for the local prototype.
 
 - `/root/sih-mailtrace/docs/MailTrace_SIH26106_Audit.pdf`
@@ -135,7 +135,7 @@ Do not treat screenshots or the old static mock `/root/sih-mailtrace/ui/case.htm
 - `mailtrace/intel.py` — offline domain/IP context lookup.
 - `mailtrace/graph_store.py` — NetworkX graph construction.
 - `mailtrace/store.py` — SQLite case persistence.
-- `mailtrace/pdf_report.py` — one-page ReportLab PDF.
+- `mailtrace/pdf_report.py` — readable multi-page ReportLab PDF with parsed evidence, provenance and uncertainty.
 
 ### Frontend
 - `ui/index.html` — actual running dossier UI.
@@ -265,7 +265,7 @@ Parser extracts Return-Path, Message-ID, URLs, and attachments, but the live UI/
 - “Origin confidence” is currently not calculated despite appearing in some explanatory wording.
 
 ### Reporting/retention
-- PDF is one page and omits many parsed fields.
+- PDF is now a readable multi-page report and includes the parsed evidence/provenance fields covered by the parity tests.
 - It can include unrelated graph edges from the full graph after multiple analyses.
 - `data/reports/` accumulates generated PDFs; cleanup/retention is not implemented.
 
